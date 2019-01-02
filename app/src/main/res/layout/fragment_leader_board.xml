@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".FragmentPackage.DashboardFragments.LeaderBoardFragment">
+
+
+    <LinearLayout
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/leaderboard_tab_bg"
+        android:elevation="5dp"
+        tools:targetApi="lollipop">
+
+        <TextView
+            android:id="@+id/tv_leaderboard_tab_all"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/leaderboard_tab_white"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="All"
+            android:textSize="15sp">
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_leaderboard_tab_friend"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/leader_board_tab"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="My Friend"
+            android:textColor="@color/color_white"
+            android:textSize="15sp">
+
+        </TextView>
+
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:text="People"
+            android:textColor="@color/color_blue"
+            android:textSize="15sp" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="32dp"
+            android:layout_toStartOf="@id/tv_rank"
+            android:text="Score"
+            android:textColor="@color/color_blue"
+            android:textSize="15sp" />
+
+
+        <TextView
+            android:id="@+id/tv_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:layout_centerVertical="true"
+            android:text="Rank"
+            android:textColor="@color/color_blue"
+            android:textSize="15sp" />
+
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_leaderboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+    </android.support.v7.widget.RecyclerView>
+
+
+</LinearLayout>

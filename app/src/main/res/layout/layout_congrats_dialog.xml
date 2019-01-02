@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/congrats_dialog_bg">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:layout_width="170dp"
+            android:layout_height="100dp"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/img_congrats" />
+
+        <FrameLayout
+            android:layout_width="250dp"
+            android:layout_height="250dp">
+
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_scrore_bg" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="350"
+                    android:textColor="@color/color_white"
+                    android:textSize="48sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="You have own!"
+                    android:textColor="@color/color_white"
+                    android:textSize="18sp" />
+
+
+            </LinearLayout>
+
+
+        </FrameLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Share With  "
+                android:textColor="#2AB2E9" />
+
+
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@android:color/transparent"
+                android:foreground="?selectableItemBackground"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_auth_facebook" />
+
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@android:color/transparent"
+                android:foreground="?selectableItemBackground"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_auth_gplus" />
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@android:color/transparent"
+                android:foreground="?selectableItemBackground"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_auth_instagram" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btn_quiz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/start_quiz_button_bg"
+        android:text="Start New Quiz"
+        android:textColor="@color/color_white"
+        android:textStyle="bold" />
+
+
+</RelativeLayout>

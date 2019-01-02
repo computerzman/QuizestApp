@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ActivityPackage.QuizActivity">
+
+    <LinearLayout
+        android:id="@+id/top_panel"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/transparent"
+            android:foreground="?selectableItemBackground"
+            android:padding="7dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_back"
+            android:visibility="visible" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_logo_top_panel" />
+
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            android:foreground="?selectableItemBackground"
+            android:padding="7dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_setting" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@android:color/transparent"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_coin" />
+
+        <TextView
+            android:id="@+id/tv_user_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="5dp"
+            android:text="1304"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_quiz_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2"
+                android:textColor="@color/color_blue"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_quiz_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/10"
+                android:textSize="18sp" />
+
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@android:color/transparent"
+            android:padding="5dp"
+            android:id="@+id/iv_stopwatch"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_stopwatch" />
+
+        <TextView
+            android:id="@+id/tv_quiz_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="5dp"
+            android:text="1:25"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:fillViewport="true"
+        android:layout_height="match_parent">
+
+        <com.quizest.quizestapp.CustomViews.ViewPagerCustomDuration
+            android:id="@+id/vp_quiz"
+            android:layout_width="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="22dp">
+
+
+        </com.quizest.quizestapp.CustomViews.ViewPagerCustomDuration>
+
+    </HorizontalScrollView>
+
+
+
+
+</LinearLayout>

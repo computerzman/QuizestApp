@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">QuizestApp</string>
+    <string name="splash_dummy_title">Avaiable but the majority have suffered many</string>
+    <string name="splash_dummy_desc">I must say to you how all this mistaken denouncing, I must say to you how all this mistaken denouncing . I must say to you how all this mistaken denouncing</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
