@@ -1,6 +1,7 @@
 package com.quizest.quizestapp.ModelPackage;
 
 public class LeaderBoard {
+
     String name;
     int points;
     int rank;
