@@ -15,9 +15,15 @@ import android.widget.TextView;
 
 import com.quizest.quizestapp.ActivityPackage.AuthActivity;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
+import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
+import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
 
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -76,6 +82,9 @@ public class LogInFragment extends Fragment {
         });
 
     }
+
+
+
 
     private void initViews() {
         View view = getView();
