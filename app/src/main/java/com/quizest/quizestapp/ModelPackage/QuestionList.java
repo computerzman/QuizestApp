@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class QuestionList{
+public class QuestionList implements  Serializable{
 
 	@SerializedName("success")
 	private boolean success;
@@ -21,7 +21,7 @@ public class QuestionList{
 	}
 
 
-	public class OptionsItem{
+	public class OptionsItem implements Serializable{
 
 		@SerializedName("option_title")
 		private String optionTitle;
