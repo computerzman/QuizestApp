@@ -26,7 +26,7 @@ public interface RetrofitInterface {
 
 
     @GET
-    Call<String> getQuizList(@Url String url);
+    Call<String> getQuizList(@Url String url, @Header("Authorization")String token);
 
 
 

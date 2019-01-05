@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.quizest.quizestapp.AdapterPackage.QuizViewPagerAdapter;
 import com.quizest.quizestapp.CustomViews.ViewPagerCustomDuration;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.QuizFragment;
+import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.QuestionList;
 import com.quizest.quizestapp.ModelPackage.UserLogIn;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
@@ -35,7 +36,6 @@ import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
-    private String QUESTION_ID;
     public ViewPagerCustomDuration quizViewPager;
     List<Fragment> quizList;
     QuizViewPagerAdapter quizViewPagerAdapter;
@@ -45,8 +45,11 @@ public class QuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
+
+        quizList = new ArrayList<>();
+
         initView();
-        QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
+        String QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
         if(QUESTION_ID != null){
             getQuestionList(QUESTION_ID);
         }
@@ -66,9 +69,10 @@ public class QuizActivity extends AppCompatActivity {
 
 
     private void getQuestionList(String QUESTION_ID) {
+        Storage storage = new Storage(this);
         final ProgressDialog dialog = Util.showDialog(this);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
-        final Call<String> questionCall = retrofitInterface.getQuizList(RetrofitClient.CATEGORY_URL + QUESTION_ID);
+        final Call<String> questionCall = retrofitInterface.getQuizList(RetrofitClient.CATEGORY_URL + QUESTION_ID, storage.getAccessToken());
         questionCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {

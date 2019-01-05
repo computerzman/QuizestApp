@@ -65,6 +65,8 @@ public class QuizFragment extends Fragment {
         if (getActivity() != null && isAdded()) {
             x = ((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1;
         }
+
+
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,13 +75,13 @@ public class QuizFragment extends Fragment {
             }
         });
 
-        ivAnswerA.setOnClickListener(new View.OnClickListener() {
+     /*   ivAnswerA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Congratsdialog congratsdialog = new Congratsdialog();
                 congratsdialog.show(getChildFragmentManager(), "");
             }
-        });
+        });*/
 
 
     }
@@ -94,7 +96,6 @@ public class QuizFragment extends Fragment {
         View view = getView();
         if (view != null) {
             optionRecyclerView = view.findViewById(R.id.recyclerview_quiz_option);
-            ivAnswerA = view.findViewById(R.id.iv_answer_a);
             btnSkip = view.findViewById(R.id.btn_skip);
         }
     }
