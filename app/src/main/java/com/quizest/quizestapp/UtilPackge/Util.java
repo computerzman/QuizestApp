@@ -18,6 +18,9 @@ import java.util.Random;
 
 public class Util {
 
+    public static final String QUIZLIST = "Quiz";
+    public static final String QUESTION = "question";
+    public static String REQUEST_TYPE = "application/json";
     private static int UPPER_BOUND = 7;
     public static int LAST_GRADIENT = 0;
 

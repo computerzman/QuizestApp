@@ -8,17 +8,15 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.quizest.quizestapp.ActivityPackage.AuthActivity;
+import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.UtilPackge.Util;
 
 public class ErrorHandler extends Application {
-
     static ErrorHandler mInstance;
-
     @Override
     public void onCreate() {
         super.onCreate();
     }
-
 
     public static synchronized ErrorHandler getInstance() {
         if (mInstance == null) {
@@ -54,9 +52,12 @@ public class ErrorHandler extends Application {
 
 
     private void goToLogInActivity(Activity activity) {
+        /*make the current user logged out*/
+        Storage storage = new Storage(activity);
+        storage.SaveLogInSate(false);
         Intent intent = new Intent(activity, AuthActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        activity.startActivity(intent);
     }
 
 }

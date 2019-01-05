@@ -131,8 +131,6 @@
         <com.quizest.quizestapp.CustomViews.ViewPagerCustomDuration
             android:id="@+id/vp_quiz"
             android:layout_width="match_parent"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_height="match_parent"
             android:layout_marginTop="22dp">
 
