@@ -1,6 +1,7 @@
 package com.quizest.quizestapp.UtilPackge;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -113,5 +114,20 @@ public class Util {
         }
         return false;
     }
+
+    public static ProgressDialog showDialog(Activity activity){
+        ProgressDialog dialog = new ProgressDialog(activity);
+        dialog.setMessage("Loading...");
+        dialog.show();
+        return dialog;
+    }
+
+
+    public static void dissmisDialog(ProgressDialog dialog){
+        if(dialog.isShowing()){
+            dialog.dismiss();
+        }
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package com.quizest.quizestapp.ModelPackage;
 
 public class CategoryModel {
+
     String name;
     int image;
 

@@ -12,6 +12,8 @@ public interface RetrofitInterface {
     Call<String> doRegistration(@Field("name")String name, @Field("phone")String phone, @Field("email") String email, @Field("password")String password, @Field("password_confirmation")String confirmPassword);
 
 
-
+    @FormUrlEncoded
+    @POST("login")
+    Call<String> doLogin(@Field("email")String email, @Field("password")String password);
 
 }

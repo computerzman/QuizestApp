@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import com.quizest.quizestapp.AdapterPackage.ImageSliderAdapter;
+import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.R;
 import com.rd.PageIndicatorView;
 import java.util.ArrayList;
@@ -110,10 +111,20 @@ public class SplashActivity extends AppCompatActivity {
         tvSplashSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SplashActivity.this, AuthActivity.class);
-                startActivity(intent);
-                SplashActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
-                finish();
+                Storage storage = new Storage(SplashActivity.this);
+                if(storage.getLogInState()){
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    SplashActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+                    finish();
+                }else{
+                    Intent intent = new Intent(SplashActivity.this, AuthActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    SplashActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+                    finish();
+                }
+
             }
         });
 

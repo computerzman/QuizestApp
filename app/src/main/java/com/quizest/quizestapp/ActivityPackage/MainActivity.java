@@ -1,5 +1,6 @@
 package com.quizest.quizestapp.ActivityPackage;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -11,18 +12,21 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.EarnCoinFragment;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.LeaderBoardFragment;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.HomeFragment;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.ViewProfileFragment;
+import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
 
 public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bv_BottomBar;
+    ImageButton btn_logout;
     Fragment currentFragment;
     LinearLayout topPanel;
 
@@ -54,6 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
         /*removing shifting animation from bottom view */
         Util.removeShiftMode(bv_BottomBar);
+
+        /*log out the user*/
+        final Storage storage = new Storage(this);
+        btn_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*change the state of the logged in to log out for the current user*/
+                storage.SaveLogInSate(false);
+                /*take the current user to the log in page*/
+                Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
+        });
 
 
         bv_BottomBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -130,5 +149,6 @@ public class MainActivity extends AppCompatActivity {
     private void initviews() {
         topPanel = findViewById(R.id.top_panel);
         bv_BottomBar = findViewById(R.id.bv_bottom_bar);
+        btn_logout = findViewById(R.id.btn_logout);
     }
 }
