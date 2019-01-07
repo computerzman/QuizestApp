@@ -3,8 +3,10 @@ package com.quizest.quizestapp.UtilPackge;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Vibrator;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
@@ -14,7 +16,9 @@ import android.widget.Toast;
 import com.quizest.quizestapp.R;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Util {
 
@@ -52,7 +56,7 @@ public class Util {
         }
     }
 
-   public static  int generateRandom(int lastRandomNumber) {
+    public static int generateRandom(int lastRandomNumber) {
         Random random = new Random();
         // add-and-wrap another random number to produce a guaranteed
         // different result.
@@ -62,6 +66,86 @@ public class Util {
         return (lastRandomNumber + rotate) % UPPER_BOUND;
 
     }
+
+
+    public static long getMillisecondsFromMinutes(int min) {
+        return (min * 60) * 1000;
+    }
+
+    public static HashMap<String, Integer> getTimeFromMillisecond(long millis) {
+
+        /*make a placeholder hash map object*/
+        HashMap<String, Integer> holder = new HashMap<>();
+
+        /*get total days from the Milliseconds with TimeUnit Object */
+        int days = (int) TimeUnit.MILLISECONDS.toDays(millis);
+        /*minus the days from the total seconds*/
+        millis -= TimeUnit.DAYS.toMillis(days);
+        /*get total hours from the Milliseconds with TimeUnit Object */
+        int hours = (int) TimeUnit.MILLISECONDS.toHours(millis);
+        /*minus the hours from the total seconds*/
+        millis -= TimeUnit.HOURS.toMillis(hours);
+        /*get total minutes from the Milliseconds with TimeUnit Object */
+        int minutes = (int) TimeUnit.MILLISECONDS.toMinutes(millis);
+        /*minus the minutes from the total seconds*/
+        millis -= TimeUnit.MINUTES.toMillis(minutes);
+        /*get total seconds from the Milliseconds with TimeUnit Object */
+        int seconds = (int) TimeUnit.MILLISECONDS.toSeconds(millis);
+
+
+        /*put the days, hours, minutes and seconds to the HashMap */
+        holder.put("day", days);
+        holder.put("hour", hours);
+        holder.put("min", minutes);
+        holder.put("sec", seconds);
+
+        /*return the hashMap*/
+        return holder;
+    }
+
+    public static void playWrongMusic(Activity activity) {
+        MediaPlayer mediaPlayer = MediaPlayer.create(activity, R.raw.music_wrong);
+        mediaPlayer.start();
+
+    }
+
+    public static void playRightMusing(Activity activity) {
+        MediaPlayer mediaPlayer = MediaPlayer.create(activity, R.raw.song_correct);
+        mediaPlayer.start();
+
+    }
+
+    public static String convertUnCapitalized(String str) {
+
+        // Create a char array of given String
+        char ch[] = str.toCharArray();
+        for (int i = 0; i < str.length(); i++) {
+
+            // If first character of a word is found
+            if (i == 0 && ch[i] != ' ' ||
+                    ch[i] != ' ' && ch[i - 1] == ' ') {
+
+                // If it is in lower-case
+                if (ch[i] >= 'a' && ch[i] <= 'z') {
+
+                    // Convert into Upper-case
+                    ch[i] = (char) (ch[i] - 'a' + 'A');
+                }
+            }
+
+            // If apart from first character
+            // Any one is in Upper-case
+            else if (ch[i] >= 'A' && ch[i] <= 'Z')
+
+                // Convert into Lower-Case
+                ch[i] = (char) (ch[i] + 'a' - 'A');
+        }
+
+        // Convert the char array to equivalent String
+        String st = new String(ch);
+        return st;
+    }
+
 
     public static int getRandomCategoryGradient(int num) {
         Util.LAST_GRADIENT = num;
@@ -99,13 +183,22 @@ public class Util {
     }
 
 
-    public static boolean isInternetAvaiable(Activity activity){
+    public static void vibratePhone(int time, Activity activity) {
+        // Get instance of Vibrator from current Context
+        Vibrator v = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
+
+// Vibrate for 400 milliseconds
+        if (v != null)
+            v.vibrate(time);
+    }
+
+    public static boolean isInternetAvaiable(Activity activity) {
         final ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
 
         if (activeNetworkInfo != null) { // connected to the internet
-        //    Toast.makeText(context, activeNetworkInfo.getTypeName(), Toast.LENGTH_SHORT).show();
+            //    Toast.makeText(context, activeNetworkInfo.getTypeName(), Toast.LENGTH_SHORT).show();
 
             if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
                 // connected to wifi
@@ -118,7 +211,7 @@ public class Util {
         return false;
     }
 
-    public static ProgressDialog showDialog(Activity activity){
+    public static ProgressDialog showDialog(Activity activity) {
         ProgressDialog dialog = new ProgressDialog(activity);
         dialog.setMessage("Loading...");
         dialog.show();
@@ -126,8 +219,8 @@ public class Util {
     }
 
 
-    public static void dissmisDialog(ProgressDialog dialog){
-        if(dialog.isShowing()){
+    public static void dissmisDialog(ProgressDialog dialog) {
+        if (dialog.isShowing()) {
             dialog.dismiss();
         }
     }

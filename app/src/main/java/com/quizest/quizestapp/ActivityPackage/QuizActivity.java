@@ -1,15 +1,20 @@
 package com.quizest.quizestapp.ActivityPackage;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.quizest.quizestapp.AdapterPackage.QuizViewPagerAdapter;
+import com.quizest.quizestapp.CustomViews.CustomViewPager;
 import com.quizest.quizestapp.CustomViews.ViewPagerCustomDuration;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.QuizFragment;
 import com.quizest.quizestapp.LocalStorage.Storage;
@@ -36,8 +41,9 @@ import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
-    public ViewPagerCustomDuration quizViewPager;
+    public CustomViewPager quizViewPager;
     List<Fragment> quizList;
+   public TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
     QuizViewPagerAdapter quizViewPagerAdapter;
 
     @Override
@@ -49,15 +55,38 @@ public class QuizActivity extends AppCompatActivity {
         quizList = new ArrayList<>();
 
         initView();
+
+
         String QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
         if(QUESTION_ID != null){
             getQuestionList(QUESTION_ID);
         }
 
+        ViewPager.PageTransformer transformer = new ViewPager.PageTransformer() {
+            @Override
+            public void transformPage(@NonNull View view, float position) {
+                if(position <= -1.0F || position >= 1.0F) {
+                    view.setTranslationX(view.getWidth() * position);
+                    view.setAlpha(0.0F);
+                } else if( position == 0.0F ) {
+                    view.setTranslationX(view.getWidth() * position);
+                    view.setAlpha(1.0F);
+                } else {
+                    // position is between -1.0F & 0.0F OR 0.0F & 1.0F
+                    view.setTranslationX(view.getWidth() * -position);
+                    view.setAlpha(1.0F - Math.abs(position));
+                }
+            }
+        };
+
+        quizViewPager.setPageTransformer(false, transformer);
     }
 
 
     private void initView() {
+        tv_quiz_time = findViewById(R.id.tv_quiz_time);
+        tvQuizCount = findViewById(R.id.tv_quiz_count);
+        tvQuizPosition = findViewById(R.id.tv_quiz_position);
         quizViewPager = findViewById(R.id.vp_quiz);
     }
 
@@ -74,6 +103,7 @@ public class QuizActivity extends AppCompatActivity {
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
         final Call<String> questionCall = retrofitInterface.getQuizList(RetrofitClient.CATEGORY_URL + QUESTION_ID, storage.getAccessToken());
         questionCall.enqueue(new Callback<String>() {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 /*handle http error globally*/
@@ -88,6 +118,11 @@ public class QuizActivity extends AppCompatActivity {
 
                             Gson gson = new Gson();
                             QuestionList questionList = gson.fromJson(response.body(), QuestionList.class);
+
+
+                            /*set available question list size*/
+                            tvQuizCount.setText(String.format("/%d",questionList.getAvailableQuestionList().size()));
+
                             for (QuestionList.AvailableQuestionListItem questions : questionList.getAvailableQuestionList()) {
                                 Bundle bundle = new Bundle();
                                 bundle.putSerializable(Util.QUESTION, (Serializable) questions);
@@ -98,7 +133,7 @@ public class QuizActivity extends AppCompatActivity {
                                 /*build view pager with option list */
                                 quizViewPagerAdapter = new QuizViewPagerAdapter(getSupportFragmentManager(), quizList, QuizActivity.this);
                                 quizViewPager.setAdapter(quizViewPagerAdapter);
-                                quizViewPager.setScrollDurationFactor(2);
+                                quizViewPager.setPagingEnabled(false);
 
 
                             }

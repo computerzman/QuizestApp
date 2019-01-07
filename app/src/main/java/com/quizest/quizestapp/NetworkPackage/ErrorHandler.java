@@ -44,7 +44,9 @@ public class ErrorHandler extends Application {
 
             case 401:
                 Toast.makeText(activity, "Session Expired!", Toast.LENGTH_SHORT).show();
-                Util.dissmisDialog(dialog);
+                if (dialog != null) {
+                    Util.dissmisDialog(dialog);
+                }
                 goToLogInActivity(activity);
                 break;
         }

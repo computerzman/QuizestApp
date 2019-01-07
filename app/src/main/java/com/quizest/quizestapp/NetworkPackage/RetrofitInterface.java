@@ -29,5 +29,9 @@ public interface RetrofitInterface {
     Call<String> getQuizList(@Url String url, @Header("Authorization")String token);
 
 
+    @FormUrlEncoded
+    @POST
+    Call<String> submitAnswer(@Url String url, @Header("Authorization")String token, @Field("answer")int answer);
+
 
 }
