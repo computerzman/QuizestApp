@@ -34,7 +34,7 @@
         android:textSize="15sp"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/tv_leaderboard_rank"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="42dp"
         android:id="@+id/tv_leaderboard_point"
         android:text="3255"
         />
@@ -50,7 +50,6 @@
         android:textColor="@color/color_blue"
         android:id="@+id/tv_leaderboard_rank"
         android:textSize="15sp"
-
         android:text="8"
         />
 

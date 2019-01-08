@@ -94,7 +94,7 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<String> call, Response<String> response) {
                 /*handle error globally */
                 ErrorHandler.getInstance().handleError(response.code(), activity, dialog);
-                if (response.isSuccessful()) {
+
                     if (response.isSuccessful()) {
                         /*success true*/
                         try {
@@ -127,7 +127,7 @@ public class HomeFragment extends Fragment {
                     }
                 }
 
-            }
+
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {

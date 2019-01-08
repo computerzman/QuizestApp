@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.quizest.quizestapp.ModelPackage.LeaderBoard;
 import com.quizest.quizestapp.R;
-import com.quizest.quizestapp.UtilPackge.Util;
+import com.quizest.quizestapp.UtilPackge.GlideApp;
 
 import java.util.List;
 
@@ -18,10 +18,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<LeaderboardRecyclerAdapter.LeaderBoardHolder> {
 
-    private List<LeaderBoard> leaderBoardList;
+    private List<LeaderBoard.LeaderListItem> leaderBoardList;
     private Activity activity;
 
-    public LeaderboardRecyclerAdapter(List<LeaderBoard> leaderBoardList, Activity activity) {
+    public LeaderboardRecyclerAdapter(List<LeaderBoard.LeaderListItem> leaderBoardList, Activity activity) {
         this.leaderBoardList = leaderBoardList;
         this.activity = activity;
     }
@@ -35,13 +35,11 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
 
     @Override
     public void onBindViewHolder(@NonNull LeaderBoardHolder holder, int position) {
-
-        holder.imgPersonImage.setImageResource(leaderBoardList.get(position).getImage());
+        GlideApp.with(activity).load(leaderBoardList.get(position).getPhoto()).into(holder.imgPersonImage);
         holder.tvPersonName.setText(leaderBoardList.get(position).getName());
-        holder.tvPersonRank.setText(String.valueOf(leaderBoardList.get(position).getRank()));
+        holder.tvPersonRank.setText(String.valueOf(leaderBoardList.get(position).getRanking()));
         holder.tvPersonRank.setTextColor(activity.getResources().getColor(R.color.color_blue));
-        holder.tvPersonPoing.setText(String.valueOf(leaderBoardList.get(position).getPoints()));
-
+        holder.tvPersonPoing.setText(leaderBoardList.get(position).getScore());
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.quizest.quizestapp.FragmentPackage.DashboardFragments;
 
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.DashPathEffect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -19,11 +24,29 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.google.gson.Gson;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
+import com.quizest.quizestapp.LocalStorage.Storage;
+import com.quizest.quizestapp.ModelPackage.ProfileSection;
+import com.quizest.quizestapp.ModelPackage.UserLogIn;
+import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
+import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
+import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
+import com.quizest.quizestapp.UtilPackge.GlideApp;
+import com.quizest.quizestapp.UtilPackge.Util;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,7 +56,10 @@ public class ViewProfileFragment extends Fragment {
 
     ImageButton btnEditProfile;
     LineChart graphQuizReport;
-    List<Entry> lineChatEntryData;
+    ImageView img_profile;
+    ArrayList<Entry> lineChatEntryData;
+    TextView userName, userEmail, userPoints, userRanking;
+    ArrayList<String> lebels;
 
     public ViewProfileFragment() {
         // Required empty public constructor
@@ -54,24 +80,29 @@ public class ViewProfileFragment extends Fragment {
 
         initViews();
 
-        chartBuilder();
+        lebels = new ArrayList<>();
+        lineChatEntryData = new ArrayList<>();
+
+        getProfileData();
 
 
         btnEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(getActivity() != null && isAdded())
-                ((MainActivity)getActivity()).fragmentTransition(new EditProfileFragment());
+                if (getActivity() != null && isAdded())
+                    ((MainActivity) getActivity()).fragmentTransition(new EditProfileFragment());
             }
         });
 
+
     }
 
-    private void chartBuilder() {
+    private void chartBuilder(final ArrayList<String> lebels, final ArrayList<Entry> lineChatEntryData) {
 
-        lineChatEntryData = new ArrayList<>();
+        /*
+         */
+        /*input data into entry *//*
 
-        /*input data into entry */
         lineChatEntryData.add(new Entry(1, 26f));
         lineChatEntryData.add(new Entry(2, 14f, getResources().getDrawable(R.drawable.circle_bg_on_graph)));
         lineChatEntryData.add(new Entry(3, 12f));
@@ -85,20 +116,7 @@ public class ViewProfileFragment extends Fragment {
         lineChatEntryData.add(new Entry(11, 15f));
         lineChatEntryData.add(new Entry(12, 18f));
 
-        final ArrayList<String> lebels = new ArrayList<>();
-
-        lebels.add("Jan");
-        lebels.add("Fav");
-        lebels.add("Mar");
-        lebels.add("Apr");
-        lebels.add("May");
-        lebels.add("Jun");
-        lebels.add("Jul");
-        lebels.add("Aug");
-        lebels.add("Sep");
-        lebels.add("Oct");
-        lebels.add("Nov");
-        lebels.add("Dec");
+*/
 
 
         LineDataSet dataSet = new LineDataSet(lineChatEntryData, ""); // add entries to dataset
@@ -125,13 +143,13 @@ public class ViewProfileFragment extends Fragment {
                 if ((int) value <= lineChatEntryData.size() - 1) {
                     return lebels.get((int) value);
                 } else {
-                    return "Jan";
+                    return "1";
                 }
 
             }
         });
 
-        graphQuizReport.setVisibleYRange(0, 30, YAxis.AxisDependency.LEFT);
+        graphQuizReport.setVisibleYRange(0, 100, YAxis.AxisDependency.LEFT);
         graphQuizReport.getAxisRight().setEnabled(false);
         graphQuizReport.getAxisLeft().setEnabled(false);
         graphQuizReport.getAxisLeft().setDrawGridLines(false);
@@ -144,9 +162,85 @@ public class ViewProfileFragment extends Fragment {
     private void initViews() {
         View view = getView();
         if (view != null) {
+            userEmail = view.findViewById(R.id.tv_user_email);
+            userName = view.findViewById(R.id.tv_profile_username);
+            userPoints = view.findViewById(R.id.tv_user_points);
+            userRanking = view.findViewById(R.id.tv_user_ranking);
+            img_profile = view.findViewById(R.id.img_profile);
             btnEditProfile = view.findViewById(R.id.btn_edit_profile);
             graphQuizReport = view.findViewById(R.id.graph_quiz_report);
         }
+    }
+
+    private void getProfileData() {
+        final ProgressDialog dialog = Util.showDialog(getActivity());
+        Storage storage = new Storage(getActivity());
+        RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
+        final Call<String> profileCall = retrofitInterface.getProfileData("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImZiNmM3OTIzNWEzNGZlMTFiMWE4YTVjMWY0ZTVjZjA2YTVkOWZiYjY5YzUzMWRlMjY3YWJmZDM4NjdmN2MzM2YwNDQwMjA2NDViZWI2MjQ1In0.eyJhdWQiOiIxIiwianRpIjoiZmI2Yzc5MjM1YTM0ZmUxMWIxYThhNWMxZjRlNWNmMDZhNWQ5ZmJiNjljNTMxZGUyNjdhYmZkMzg2N2Y3YzMzZjA0NDAyMDY0NWJlYjYyNDUiLCJpYXQiOjE1NDY2NzI0NDQsIm5iZiI6MTU0NjY3MjQ0NCwiZXhwIjoxNTc4MjA4NDQ0LCJzdWIiOiI4Iiwic2NvcGVzIjpbXX0.i2h_5F-OL5sQ0sW5LrXfRJdm9g2a2aa7d6GX1toM4aP2KRQIJPP85HbT9N0Rx1HYB3GpobPSzl77dUWQ0SNv3wwqTdrYBTEx38RlhIqjEnCIUDcCCimjDqEIENGLzokeCIWrbZEdrFRZBvdAdfKkQApADp22tY3eHCdd64Lx8vibDkZV9BrRduJvJogKwqULZ4VHF4rkU9N_ZF4ukvImbWbTn3VIg9McdwDKViDVY3kG_bttp2vGFw1djJZVNA4juoeVf6N5CeH5AO65mkLjuHdr2FZyF1tVMnjjMSRpGhWrJdiGyo1-72HJxG3O7qVQWA8KSz7jSVQB3BnK0SBRCqly58OiKcVHTNaOa0ubEHCFE4oP_ISzP8u2HUQJZSrWyP1qDjxQwYTG5BPxVFPGsZzg4FbsnSQ5eDtXWkvXNQjVgb879hRHC2Wl1BAtVacp6j0ED7ClPapt83y0Df3DSbjYHKBZlNzsHMwrY0i5PgeaLnDGMMWxPUn2GClJVNO7DEmJb3XqQsn2zbJknYhwuByM-5vrZH9G31ckK6qcjTSCHZYMKFC5ejFxJrU3opYNZuxl9UbbTqoCjbfTbSDWY4wrht65WM-dwt1D-WWibOGktwF8M2jY-ErEkNGJ2u-fRs5SPjQ_Mbkyo94DaRknJGgpFJcROaxg0qunfN0q6zM");
+        profileCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                /*handle error globally */
+                ErrorHandler.getInstance().handleError(response.code(), getActivity(), dialog);
+                if (response.isSuccessful()) {
+                    /*success true*/
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        boolean isSuccess = jsonObject.getBoolean("success");
+                        if (isSuccess) {
+                            /*serialize the String response  */
+                            Gson gson = new Gson();
+                            ProfileSection profileSection = gson.fromJson(response.body(), ProfileSection.class);
+
+                            /*simple data binding for profile section*/
+                            userEmail.setText(profileSection.getData().getUser().getEmail());
+                            userName.setText(profileSection.getData().getUser().getName());
+                            userPoints.setText(profileSection.getData().getUser().getPoints());
+                            userRanking.setText(String.valueOf(profileSection.getData().getUser().getRanking()));
+                            if(getActivity() != null)
+                            GlideApp.with(getActivity()).load(profileSection.getData().getUser().getPhoto()).into(img_profile);
+
+                            /*make the chart*/
+                            for (int i = 0; i < profileSection.getDailyScore().size(); i++) {
+                                lineChatEntryData.add(new Entry(i, Math.round((float) profileSection.getDailyScore().get(i).getScorePercentage())));
+                                lebels.add(Util.getFormattedDate(profileSection.getDailyScore().get(i).getDate()));
+                            }
+
+                            chartBuilder(lebels, lineChatEntryData);
+
+                            /*dismiss the dialog*/
+                            Util.dissmisDialog(dialog);
+
+                        } else {
+                            /*dismiss the dialog*/
+                            Util.dissmisDialog(dialog);
+                            /*get all the error messages and show to the user*/
+                            String message = jsonObject.getString("message");
+                            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    /*dismiss the dialog*/
+                    Util.dissmisDialog(dialog);
+                    Toast.makeText(getActivity(), R.string.no_data_found, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                /*dismiss the dialog*/
+                Util.dissmisDialog(dialog);
+                /*handle network error and notify the user*/
+                if (t instanceof SocketTimeoutException || t instanceof IOException) {
+                    if (getActivity() != null && isAdded())
+                        Toast.makeText(getActivity(), R.string.connection_timeout, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 }

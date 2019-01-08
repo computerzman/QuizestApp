@@ -1,7 +1,12 @@
 package com.quizest.quizestapp.FragmentPackage.DashboardFragments;
 
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,13 +15,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.AdapterPackage.LeaderboardRecyclerAdapter;
+import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.LeaderBoard;
+import com.quizest.quizestapp.ModelPackage.UserLogIn;
+import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
+import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
+import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
+import com.quizest.quizestapp.UtilPackge.Util;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,10 +47,10 @@ import java.util.List;
  */
 public class LeaderBoardFragment extends Fragment {
 
+    Activity activity;
     RecyclerView leadboardRecyclerView;
     TextView tvLeaderBoardTabAll, tvLeaderBoardTabFriend;
     LeaderboardRecyclerAdapter leaderboardRecyclerAdapter;
-    List<LeaderBoard> leaderBoardList;
 
     public LeaderBoardFragment() {
         // Required empty public constructor
@@ -35,8 +58,14 @@ public class LeaderBoardFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if (getActivity() != null) {
+
+            activity = getActivity();
+
+        }
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_leader_board, container, false);
     }
@@ -45,7 +74,12 @@ public class LeaderBoardFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         initViews();
+
+        if (getActivity() != null) {
+            activity = getActivity();
+        }
 
         tvLeaderBoardTabAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,19 +106,9 @@ public class LeaderBoardFragment extends Fragment {
         leadboardRecyclerView.setHasFixedSize(true);
         leadboardRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        leaderBoardList = new ArrayList<>();
-        leaderBoardList.add(new LeaderBoard("Charles Daikin", 3435, 1, R.drawable.img_person));
-        leaderBoardList.add(new LeaderBoard("Jopny Daikin", 3435, 2, R.drawable.img_person));
-        leaderBoardList.add(new LeaderBoard("Charles Done", 254, 3, R.drawable.img_person));
-        leaderBoardList.add(new LeaderBoard("Jopny Daikin", 424524, 4, R.drawable.img_person));
-        leaderBoardList.add(new LeaderBoard("Rahim Daikin", 2543, 5, R.drawable.img_person));
-        leaderBoardList.add(new LeaderBoard("Morgal Daikin", 3435, 6, R.drawable.img_person));
-        leaderBoardList.add(new LeaderBoard("Charles Daikin", 3435, 7, R.drawable.img_person));
 
 
-        leaderboardRecyclerAdapter = new LeaderboardRecyclerAdapter(leaderBoardList, getActivity());
-
-        leadboardRecyclerView.setAdapter(leaderboardRecyclerAdapter);
+        getLeaderBoardData();
 
     }
 
@@ -96,6 +120,61 @@ public class LeaderBoardFragment extends Fragment {
             tvLeaderBoardTabFriend = view.findViewById(R.id.tv_leaderboard_tab_friend);
         }
 
+    }
+
+    private void getLeaderBoardData() {
+        final ProgressDialog dialog = Util.showDialog(activity);
+        Storage storage = new Storage(activity);
+        RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
+        Call<String> leaderCall = retrofitInterface.getLeaderboardList(storage.getAccessToken());
+        leaderCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                /*handle error globally */
+                ErrorHandler.getInstance().handleError(response.code(), activity, dialog);
+                if (response.isSuccessful()) {
+                    /*success true*/
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        boolean isSuccess = jsonObject.getBoolean("success");
+                        if (isSuccess) {
+                            /*serialize the String response  */
+                            Gson gson = new Gson();
+                            LeaderBoard leaderBoard = gson.fromJson(response.body(), LeaderBoard.class);
+                            leaderboardRecyclerAdapter = new LeaderboardRecyclerAdapter(leaderBoard.getLeaderList(), activity);
+                            leadboardRecyclerView.setAdapter(leaderboardRecyclerAdapter);
+
+                            Util.dissmisDialog(dialog);
+
+                        } else {
+                            /*dismiss the dialog*/
+                            Util.dissmisDialog(dialog);
+                            /*get all the error messages and show to the user*/
+                            String message = jsonObject.getString("message");
+                            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    /*dismiss the dialog*/
+                    Util.dissmisDialog(dialog);
+                    Toast.makeText(activity, R.string.no_data_found, Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                /*dismiss the dialog*/
+                Util.dissmisDialog(dialog);
+                /*handle network error and notify the user*/
+                if (t instanceof SocketTimeoutException || t instanceof IOException) {
+                    Toast.makeText(activity, R.string.connection_timeout, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 }

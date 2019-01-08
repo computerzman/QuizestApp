@@ -11,9 +11,12 @@ import android.support.constraint.solver.widgets.Helper;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,10 +37,11 @@ public class QuizFragment extends Fragment {
 
     Button btnSkip;
     ImageView ivAnswerA;
-    int x;
-     static CountDownTimer countDownTimer;
+    CountDownTimer countDownTimer = null;
     TextView tv_question_name;
+    TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
     RecyclerView optionRecyclerView;
+    ImageView catStatus, iv_stopwatch;
     QuizOptionsRecyclerRow quizOptionsRecyclerRow;
 
     public QuizFragment() {
@@ -59,12 +63,11 @@ public class QuizFragment extends Fragment {
 
         initViews();
 
-
-        if (getActivity() != null && isAdded())
-            ((QuizActivity) getActivity()).tvQuizPosition.setText(String.valueOf(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1));
-
-        if (getActivity() != null && isAdded())
-            ((QuizActivity) getActivity()).tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
+        if (getActivity() != null && isAdded()) {
+            iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
+            tvQuizPosition.setText(String.format("%d", ((QuizActivity) getActivity()).x++));
+            tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
+        }
 
         buildOptionRecycler();
 
@@ -72,59 +75,70 @@ public class QuizFragment extends Fragment {
             QuestionList.AvailableQuestionListItem questionItem = (QuestionList.AvailableQuestionListItem) getArguments().getSerializable(Util.QUESTION);
             if (questionItem != null) {
                 /*set question name*/
+                tvQuizCount.setText(String.format("/%d", ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()));
                 tv_question_name.setText(questionItem.getTitle());
-                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint());
+                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), catStatus);
                 optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
                 TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
             }
         }
 
 
-
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
-
             public void onClick(View view) {
-                if (getActivity() != null && isAdded()){
-                    if(((QuizActivity)getActivity()).questionList != null)
-                   if(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1 == ((QuizActivity)getActivity()).questionList.getAvailableQuestionList().size()){
-                       Congratsdialog congratsdialog = new Congratsdialog();
-                       congratsdialog.show(getChildFragmentManager(), "");
-                   }else{
-                        ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
-                        ((QuizActivity) getActivity()).tvQuizPosition.setText(String.valueOf(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1));
+                if (getActivity() != null && isAdded()) {
+                    if (((QuizActivity) getActivity()).questionList != null) {
+                        if (((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1 == ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()) {
+                            Congratsdialog congratsdialog = new Congratsdialog();
+                            congratsdialog.show(getChildFragmentManager(), "");
+                        } else {
+                            ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
+                        }
                     }
-
                 }
-
-
             }
         });
     }
 
 
-    private  void TimeCount(long milliseconds) {
-         countDownTimer = new CountDownTimer(milliseconds, 1000) {
+    private void TimeCount(long milliseconds) {
+        countDownTimer = new CountDownTimer(milliseconds, 1000) {
             @Override
             public void onTick(long l) {
                 /*call this method every one second with reducing 1000 millisecond */
+                if ((l / 1000) <= 10) {
+                    doBlinkAnimation(tv_quiz_time);
+                    iv_stopwatch.setImageResource(R.drawable.ic_frown);
+                }
                 setQuizTime(Util.getTimeFromMillisecond(l));
             }
 
             @Override
             public void onFinish() {
-                /*code to execute after the countdown finish*/
+                removeBlinkAnimation(tv_quiz_time);
+                iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
+                tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
+                if (getActivity() != null && isAdded())
+                    ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                }
+
             }
         };
-
         countDownTimer.start();
     }
 
 
     @SuppressLint("DefaultLocale")
     private void setQuizTime(HashMap<String, Integer> timeFromMillisecond) {
-        if (getActivity() != null && isAdded())
-            ((QuizActivity) getActivity()).tv_quiz_time.setText(String.format("%d:%d", timeFromMillisecond.get("min"), timeFromMillisecond.get("sec")));
+        if (getActivity() != null && isAdded()) {
+            tv_quiz_time.setText(String.format("%s:%s", String.valueOf(timeFromMillisecond.get("min")), String.valueOf(timeFromMillisecond.get("sec"))));
+
+
+        }
+
     }
 
     private void buildOptionRecycler() {
@@ -136,12 +150,39 @@ public class QuizFragment extends Fragment {
     private void initViews() {
         View view = getView();
         if (view != null) {
+            catStatus = view.findViewById(R.id.img_cat_status);
+            tv_quiz_time = view.findViewById(R.id.tv_quiz_time);
+            tvQuizCount = view.findViewById(R.id.tv_quiz_count);
+            tvQuizPosition = view.findViewById(R.id.tv_quiz_position);
+            iv_stopwatch = view.findViewById(R.id.iv_stopwatch);
             tv_question_name = view.findViewById(R.id.tv_question_name);
             optionRecyclerView = view.findViewById(R.id.recyclerview_quiz_option);
             btnSkip = view.findViewById(R.id.btn_skip);
         }
     }
 
+
+    private void doBlinkAnimation(TextView textView) {
+        Animation anim = new AlphaAnimation(0.0f, 1.0f);
+        anim.setDuration(50); //You can manage the blinking time with this parameter
+        anim.setStartOffset(20);
+        anim.setRepeatMode(Animation.REVERSE);
+        anim.setRepeatCount(Animation.INFINITE);
+        textView.startAnimation(anim);
+    }
+
+
+    private void removeBlinkAnimation(TextView textView) {
+        textView.clearAnimation();
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        super.onDestroyView();
+    }
 
 
 }

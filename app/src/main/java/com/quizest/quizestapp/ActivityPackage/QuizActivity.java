@@ -44,7 +44,7 @@ public class QuizActivity extends AppCompatActivity {
    public QuestionList questionList;
     public CustomViewPager quizViewPager;
     List<Fragment> quizList;
-    public TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
+    public int x  = 0;
     QuizViewPagerAdapter quizViewPagerAdapter;
 
     @Override
@@ -87,9 +87,6 @@ public class QuizActivity extends AppCompatActivity {
 
 
     private void initView() {
-        tv_quiz_time = findViewById(R.id.tv_quiz_time);
-        tvQuizCount = findViewById(R.id.tv_quiz_count);
-        tvQuizPosition = findViewById(R.id.tv_quiz_position);
         quizViewPager = findViewById(R.id.vp_quiz);
     }
 
@@ -124,7 +121,7 @@ public class QuizActivity extends AppCompatActivity {
 
 
                             /*set available question list size*/
-                            tvQuizCount.setText(String.format("/%d", questionList.getAvailableQuestionList().size()));
+                         //
 
                             for (QuestionList.AvailableQuestionListItem questions : questionList.getAvailableQuestionList()) {
                                 Bundle bundle = new Bundle();

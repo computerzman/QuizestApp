@@ -41,13 +41,15 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
     private String questionID;
     private int point;
     private int Rightid = 0;
+    ImageView imageView;
     private boolean isAnswered = false;
 
-    public QuizOptionsRecyclerRow(List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID, int point) {
+    public QuizOptionsRecyclerRow(List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID, int point, ImageView imageView) {
         this.optionsItemList = optionsItemList;
         this.point = point;
         this.activity = activity;
         this.questionID = questionID;
+        this.imageView = imageView;
     }
 
     @NonNull
@@ -96,7 +98,7 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
     }
 
 
-    private void submitAnswer(String optionID, int position, final QuizOptionsHolder holder) {
+    public void submitAnswer(String optionID, int position, final QuizOptionsHolder holder) {
         Storage storage = new Storage(activity);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
         final Call<String> submitAnserCall = retrofitInterface.submitAnswer(RetrofitClient.SUBMIT_ANSWER_ULR + optionID, storage.getAccessToken(), optionsItemList.get(position).getId());
@@ -111,6 +113,7 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                         JSONObject jsonObject = new JSONObject(response.body());
                         boolean isSuccess = jsonObject.getBoolean("success");
                         if (!isSuccess) {
+                            imageView.setImageResource(R.drawable.ic_cat_worng);
                             Util.playWrongMusic(activity);
                             Util.vibratePhone(900, activity);
                             /*serialize the String response  */
@@ -122,6 +125,7 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                             Rightid = submitAnswer.getRightAnswer().getOptionId();
                             notifyDataSetChanged();
                         } else {
+                            imageView.setImageResource(R.drawable.ic_cat);
                             Util.TOTAL_POINT = Util.TOTAL_POINT + point;
                             Util.playRightMusing(activity);
                             isAnswered = true;

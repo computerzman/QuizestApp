@@ -16,7 +16,7 @@
     </style>
 
     <!--dialog fragment customized theme-->
-    <style name="MY.DIALOG" parent="Theme.AppCompat.Light" >
+    <style name="MY.DIALOG" parent="Theme.AppCompat" >
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowIsFloating">false</item>

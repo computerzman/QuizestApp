@@ -4,6 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HEAD;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -32,6 +33,14 @@ public interface RetrofitInterface {
     @FormUrlEncoded
     @POST
     Call<String> submitAnswer(@Url String url, @Header("Authorization")String token, @Field("answer")int answer);
+
+
+    @GET("leader-board")
+    Call<String> getLeaderboardList(@Header("Authorization")String token);
+
+    @GET("profile")
+    Call<String> getProfileData(@Header("Authorization")String token);
+
 
 
 }

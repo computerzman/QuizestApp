@@ -1,5 +1,6 @@
 package com.quizest.quizestapp.UtilPackge;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,6 +17,10 @@ import android.widget.Toast;
 import com.quizest.quizestapp.R;
 
 import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -115,6 +120,14 @@ public class Util {
         mediaPlayer.start();
 
     }
+
+
+    @SuppressLint("SimpleDateFormat")
+    public static String getFormattedDate(String date) {
+        String[] section = date.split(" ");
+        return section[0];
+    }
+
 
     public static String convertUnCapitalized(String str) {
 

@@ -26,7 +26,7 @@ import com.quizest.quizestapp.UtilPackge.Util;
 public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bv_BottomBar;
-    ImageButton btn_logout;
+    ImageButton btn_logout, btn_setting;
     Fragment currentFragment;
     LinearLayout topPanel;
 
@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         /*type casting views */
         initviews();
 
-
         fragmentTransition(new HomeFragment());
 
         /*removing shifting animation from bottom view */
@@ -74,13 +73,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btn_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(intent);
+                MainActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+                finish();
+            }
+        });
 
         bv_BottomBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 switch (item.getItemId()) {
-
                     case R.id.navigation_home:
                         RestMode();
                         if (!(currentFragment instanceof HomeFragment))
@@ -101,9 +107,7 @@ public class MainActivity extends AppCompatActivity {
                             currentFragment = new LeaderBoardFragment();
                         break;
                 }
-
                 fragmentTransition(currentFragment);
-
                 return true;
             }
         });
@@ -150,5 +154,6 @@ public class MainActivity extends AppCompatActivity {
         topPanel = findViewById(R.id.top_panel);
         bv_BottomBar = findViewById(R.id.bv_bottom_bar);
         btn_logout = findViewById(R.id.btn_logout);
+        btn_setting = findViewById(R.id.btn_setting);
     }
 }
