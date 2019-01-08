@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Util {
 
+    public static int TOTAL_POINT = 0;
     public static final String QUIZLIST = "Quiz";
     public static final String QUESTION = "question";
     public static String REQUEST_TYPE = "application/json";

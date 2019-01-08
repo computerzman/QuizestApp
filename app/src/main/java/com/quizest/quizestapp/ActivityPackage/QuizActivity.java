@@ -41,9 +41,10 @@ import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
+   public QuestionList questionList;
     public CustomViewPager quizViewPager;
     List<Fragment> quizList;
-   public TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
+    public TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
     QuizViewPagerAdapter quizViewPagerAdapter;
 
     @Override
@@ -52,23 +53,25 @@ public class QuizActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quiz);
 
 
+        Util.TOTAL_POINT = 0;
+
         quizList = new ArrayList<>();
 
         initView();
 
 
         String QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
-        if(QUESTION_ID != null){
+        if (QUESTION_ID != null) {
             getQuestionList(QUESTION_ID);
         }
 
         ViewPager.PageTransformer transformer = new ViewPager.PageTransformer() {
             @Override
             public void transformPage(@NonNull View view, float position) {
-                if(position <= -1.0F || position >= 1.0F) {
+                if (position <= -1.0F || position >= 1.0F) {
                     view.setTranslationX(view.getWidth() * position);
                     view.setAlpha(0.0F);
-                } else if( position == 0.0F ) {
+                } else if (position == 0.0F) {
                     view.setTranslationX(view.getWidth() * position);
                     view.setAlpha(1.0F);
                 } else {
@@ -117,11 +120,11 @@ public class QuizActivity extends AppCompatActivity {
                             /*serialize the String response  */
 
                             Gson gson = new Gson();
-                            QuestionList questionList = gson.fromJson(response.body(), QuestionList.class);
+                            questionList = gson.fromJson(response.body(), QuestionList.class);
 
 
                             /*set available question list size*/
-                            tvQuizCount.setText(String.format("/%d",questionList.getAvailableQuestionList().size()));
+                            tvQuizCount.setText(String.format("/%d", questionList.getAvailableQuestionList().size()));
 
                             for (QuestionList.AvailableQuestionListItem questions : questionList.getAvailableQuestionList()) {
                                 Bundle bundle = new Bundle();

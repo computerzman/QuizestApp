@@ -39,11 +39,13 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
     private List<QuestionList.OptionsItem> optionsItemList;
     private Activity activity;
     private String questionID;
+    private int point;
     private int Rightid = 0;
     private boolean isAnswered = false;
 
-    public QuizOptionsRecyclerRow(List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID) {
+    public QuizOptionsRecyclerRow(List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID, int point) {
         this.optionsItemList = optionsItemList;
+        this.point = point;
         this.activity = activity;
         this.questionID = questionID;
     }
@@ -57,8 +59,6 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
 
     @Override
     public void onBindViewHolder(@NonNull final QuizOptionsHolder holder, final int position) {
-
-
         if (Rightid != 0) {
             if (optionsItemList.get(position).getId() == Rightid) {
                 holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
@@ -69,7 +69,6 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
             holder.quizOptionBg.setEnabled(true);
         }
         holder.quizOptionName.setText(Util.convertUnCapitalized(optionsItemList.get(position).getOptionTitle()));
-
         holder.quizOptionBg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,11 +105,9 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
             public void onResponse(Call<String> call, Response<String> response) {
                 /*handle error globally */
                 ErrorHandler.getInstance().handleError(response.code(), activity, null);
-
                 if (response.isSuccessful()) {
                     /*success true*/
                     try {
-
                         JSONObject jsonObject = new JSONObject(response.body());
                         boolean isSuccess = jsonObject.getBoolean("success");
                         if (!isSuccess) {
@@ -124,8 +121,8 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                             isAnswered = true;
                             Rightid = submitAnswer.getRightAnswer().getOptionId();
                             notifyDataSetChanged();
-
                         } else {
+                            Util.TOTAL_POINT = Util.TOTAL_POINT + point;
                             Util.playRightMusing(activity);
                             isAnswered = true;
                             holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));

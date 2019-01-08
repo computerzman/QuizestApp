@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.quizest.quizestapp.ActivityPackage.QuizActivity;
 import com.quizest.quizestapp.AdapterPackage.QuizOptionsRecyclerRow;
+import com.quizest.quizestapp.DialogPackage.Congratsdialog;
 import com.quizest.quizestapp.ModelPackage.QuestionList;
 import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
@@ -72,7 +73,7 @@ public class QuizFragment extends Fragment {
             if (questionItem != null) {
                 /*set question name*/
                 tv_question_name.setText(questionItem.getTitle());
-                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId());
+                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint());
                 optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
                 TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
             }
@@ -84,9 +85,18 @@ public class QuizFragment extends Fragment {
             @Override
 
             public void onClick(View view) {
-                if (getActivity() != null && isAdded())
-                    ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
-                ((QuizActivity) getActivity()).tvQuizPosition.setText(String.valueOf(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1));
+                if (getActivity() != null && isAdded()){
+                    if(((QuizActivity)getActivity()).questionList != null)
+                   if(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1 == ((QuizActivity)getActivity()).questionList.getAvailableQuestionList().size()){
+                       Congratsdialog congratsdialog = new Congratsdialog();
+                       congratsdialog.show(getChildFragmentManager(), "");
+                   }else{
+                        ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
+                        ((QuizActivity) getActivity()).tvQuizPosition.setText(String.valueOf(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1));
+                    }
+
+                }
+
 
             }
         });

@@ -1,6 +1,9 @@
 package com.quizest.quizestapp.DialogPackage;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,46 +11,41 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.TextView;
 
 import com.quizest.quizestapp.R;
+import com.quizest.quizestapp.UtilPackge.Util;
+
+import java.util.Objects;
 
 public class Congratsdialog extends DialogFragment {
 
-    @Nullable
+    TextView tv_result;
+
+
+    @NonNull
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.layout_congrats_dialog, container, false);
-    }
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        /*set custom style with this dialog*/
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.MY_DIALOG);
-    }
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        if (getActivity() != null && isAdded()) {
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View in = inflater.inflate(R.layout.layout_congrats_dialog, null);
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        /*get the dialog and set animation with the custom animation created in the anim folder */
-        if (getDialog().getWindow() != null)
-            getDialog().getWindow()
-                    .getAttributes().windowAnimations = R.style.DialogAnimation;
-    }
+            tv_result = in.findViewById(R.id.tv_result);
 
-    @Override
-    public void onStart() {
-        super.onStart();
+            tv_result.setText(String.valueOf(Util.TOTAL_POINT));
 
-        /*get the current dialog*/
-        Dialog dialog = getDialog();
+            builder.setView(in);
 
-        /*make the current dialog full screen with layoutparams*/
-        if (dialog != null) {
-            int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = ViewGroup.LayoutParams.MATCH_PARENT;
-            if (dialog.getWindow() != null)
-                dialog.getWindow().setLayout(width, height);
+
         }
+
+
+        return builder.create();
+
     }
+
+
 }

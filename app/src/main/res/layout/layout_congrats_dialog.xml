@@ -39,6 +39,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tv_result"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="350"
@@ -48,7 +49,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="You have own!"
+                    android:text="Your Score!"
                     android:textColor="@color/color_white"
                     android:textSize="18sp" />
 
