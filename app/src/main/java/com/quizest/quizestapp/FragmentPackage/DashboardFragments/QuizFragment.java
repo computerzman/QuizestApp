@@ -35,14 +35,17 @@ import java.util.HashMap;
  */
 public class QuizFragment extends Fragment {
 
+
+    CounterClass counterClass;
     Button btnSkip;
     ImageView ivAnswerA;
-    CountDownTimer countDownTimer = null;
+    private static CountDownTimer countDownTimer = null;
     TextView tv_question_name;
     TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
     RecyclerView optionRecyclerView;
     ImageView catStatus, iv_stopwatch;
     QuizOptionsRecyclerRow quizOptionsRecyclerRow;
+
 
     public QuizFragment() {
         // Required empty public constructor
@@ -64,6 +67,8 @@ public class QuizFragment extends Fragment {
         initViews();
 
         if (getActivity() != null && isAdded()) {
+
+
             iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
             tvQuizPosition.setText(String.format("%d", ((QuizActivity) getActivity()).x++));
             tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
@@ -75,11 +80,20 @@ public class QuizFragment extends Fragment {
             QuestionList.AvailableQuestionListItem questionItem = (QuestionList.AvailableQuestionListItem) getArguments().getSerializable(Util.QUESTION);
             if (questionItem != null) {
                 /*set question name*/
+
+                if(counterClass != null){
+                    counterClass.cancel();
+                }
+                counterClass = new CounterClass(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()), 1000);
+                counterClass.start();
+                //TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
                 tvQuizCount.setText(String.format("/%d", ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()));
                 tv_question_name.setText(questionItem.getTitle());
                 quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), catStatus);
                 optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
-                TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
+
+
+
             }
         }
 
@@ -101,6 +115,37 @@ public class QuizFragment extends Fragment {
         });
     }
 
+    class CounterClass extends CountDownTimer {
+
+        public CounterClass(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+
+            /*call this method every one second with reducing 1000 millisecond */
+            if ((millisUntilFinished / 1000) <= 10) {
+                doBlinkAnimation(tv_quiz_time);
+                iv_stopwatch.setImageResource(R.drawable.ic_frown);
+            }
+            setQuizTime(Util.getTimeFromMillisecond(millisUntilFinished));
+        }
+
+        @Override
+        public void onFinish() {
+            removeBlinkAnimation(tv_quiz_time);
+            iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
+            tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
+            if (getActivity() != null && isAdded())
+                Log.e("MKTESTTIME", "HOW MUCH TIME?");
+            ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
+        }
+
+        public void cancelTime(){
+            cancel();
+        }
+    }
 
     private void TimeCount(long milliseconds) {
         countDownTimer = new CountDownTimer(milliseconds, 1000) {
@@ -120,10 +165,9 @@ public class QuizFragment extends Fragment {
                 iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
                 tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
                 if (getActivity() != null && isAdded())
-                    ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
-                if (countDownTimer != null) {
-                    countDownTimer.cancel();
-                }
+                    Log.e("MKTESTTIME", "HOW MUCH TIME?");
+                ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
+
 
             }
         };

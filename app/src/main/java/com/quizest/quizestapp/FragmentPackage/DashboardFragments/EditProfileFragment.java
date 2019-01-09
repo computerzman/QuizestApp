@@ -39,7 +39,6 @@ import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
- *
  */
 public class EditProfileFragment extends Fragment {
 
@@ -48,6 +47,7 @@ public class EditProfileFragment extends Fragment {
     ImageButton btn_setting_edit;
     EditText edtUserName;
     EditText CountryName, Phone;
+
     public EditProfileFragment() {
         // Required empty public constructor
     }
@@ -72,7 +72,7 @@ public class EditProfileFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), SettingActivity.class);
                 startActivity(intent);
-                if(getActivity() != null)
+                if (getActivity() != null)
                     getActivity().overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
                 getActivity().finish();
             }
@@ -81,19 +81,19 @@ public class EditProfileFragment extends Fragment {
         getProfileData();
     }
 
-    private void initViews(){
-            View view = getView();
-            if(view != null){
-                profileImage = view.findViewById(R.id.img_edit_profile);
-                edtUserName = view.findViewById(R.id.edt_username_edit);
-                CountryName = view.findViewById(R.id.edt_country_edit);
-                Phone = view.findViewById(R.id.edt_phone_edit);
-                tvEmail = view.findViewById(R.id.tv_email_edit);
-                tvName = view.findViewById(R.id.tv_name_edit);
-                tvPoint = view.findViewById(R.id.tv_total_point_edit);
-                tvRanking = view.findViewById(R.id.tv_rank_edit);
-                btn_setting_edit = view.findViewById(R.id.btn_setting_edit);
-            }
+    private void initViews() {
+        View view = getView();
+        if (view != null) {
+            profileImage = view.findViewById(R.id.img_edit_profile);
+            edtUserName = view.findViewById(R.id.edt_username_edit);
+            CountryName = view.findViewById(R.id.edt_country_edit);
+            Phone = view.findViewById(R.id.edt_phone_edit);
+            tvEmail = view.findViewById(R.id.tv_email_edit);
+            tvName = view.findViewById(R.id.tv_name_edit);
+            tvPoint = view.findViewById(R.id.tv_total_point_edit);
+            tvRanking = view.findViewById(R.id.tv_rank_edit);
+            btn_setting_edit = view.findViewById(R.id.btn_setting_edit);
+        }
     }
 
     private void getProfileData() {
@@ -122,7 +122,7 @@ public class EditProfileFragment extends Fragment {
                             tvName.setText(profileSection.getData().getUser().getName());
                             tvPoint.setText(profileSection.getData().getUser().getPoints());
                             edtUserName.setText(profileSection.getData().getUser().getName());
-                            if(profileSection.getData().getUser().getCountry() != null){
+                            if (profileSection.getData().getUser().getCountry() != null) {
                                 CountryName.setText(profileSection.getData().getUser().getCountry());
                             }
                             Phone.setText(profileSection.getData().getUser().getPhone());
