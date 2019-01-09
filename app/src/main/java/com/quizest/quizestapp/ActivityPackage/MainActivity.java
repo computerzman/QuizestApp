@@ -9,11 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.LayoutDirection;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.EarnCoinFragment;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.LeaderBoardFragment;
@@ -25,10 +27,12 @@ import com.quizest.quizestapp.UtilPackge.Util;
 
 public class MainActivity extends AppCompatActivity {
 
+
     BottomNavigationView bv_BottomBar;
     ImageButton btn_logout, btn_setting;
     Fragment currentFragment;
     LinearLayout topPanel;
+    RelativeLayout relativeLayout;
 
 
     @Override
@@ -49,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
                 getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }
         }
+
+        relativeLayout = findViewById(R.id.test);
+        relativeLayout.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
 
         /*type casting views */
         initviews();

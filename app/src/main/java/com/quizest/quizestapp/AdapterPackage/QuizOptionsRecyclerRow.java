@@ -41,15 +41,17 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
     private String questionID;
     private int point;
     private int Rightid = 0;
+    TextView textView;
     ImageView imageView;
     private boolean isAnswered = false;
 
-    public QuizOptionsRecyclerRow(List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID, int point, ImageView imageView) {
+    public QuizOptionsRecyclerRow(List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID, int point, ImageView imageView, TextView tv_user_point) {
         this.optionsItemList = optionsItemList;
         this.point = point;
         this.activity = activity;
         this.questionID = questionID;
         this.imageView = imageView;
+        textView = tv_user_point;
     }
 
     @NonNull
@@ -113,18 +115,30 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                         JSONObject jsonObject = new JSONObject(response.body());
                         boolean isSuccess = jsonObject.getBoolean("success");
                         if (!isSuccess) {
-                            imageView.setImageResource(R.drawable.ic_cat_worng);
-                            Util.playWrongMusic(activity);
-                            Util.vibratePhone(900, activity);
-                            /*serialize the String response  */
-                            holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
-                            holder.quizOptionBg.setImageResource(R.drawable.quiz_option_wrong);
-                            Gson gson = new Gson();
-                            SubmitAnswer submitAnswer = gson.fromJson(response.body(), SubmitAnswer.class);
-                            isAnswered = true;
-                            Rightid = submitAnswer.getRightAnswer().getOptionId();
-                            notifyDataSetChanged();
+                            if(optionsItemList.size() != 1){
+                                imageView.setImageResource(R.drawable.ic_cat_worng);
+                                Util.playWrongMusic(activity);
+                                Util.vibratePhone(900, activity);
+                                /*serialize the String response  */
+                                holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
+                                holder.quizOptionBg.setImageResource(R.drawable.quiz_option_wrong);
+                                Gson gson = new Gson();
+                                SubmitAnswer submitAnswer = gson.fromJson(response.body(), SubmitAnswer.class);
+                                isAnswered = true;
+                                Rightid = submitAnswer.getRightAnswer().getOptionId();
+                                notifyDataSetChanged();
+                            }else{
+                                imageView.setImageResource(R.drawable.ic_cat_worng);
+                                Util.playWrongMusic(activity);
+                                Util.vibratePhone(900, activity);
+                                holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
+                                holder.quizOptionBg.setImageResource(R.drawable.quiz_option_wrong);
+                            }
+
                         } else {
+                            String score = jsonObject.getString("score");
+                            Util.QuizPoint = Integer.parseInt(score);
+                            textView.setText(score);
                             imageView.setImageResource(R.drawable.ic_cat);
                             Util.TOTAL_POINT = Util.TOTAL_POINT + point;
                             Util.playRightMusing(activity);

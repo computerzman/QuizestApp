@@ -37,12 +37,6 @@ public class Congratsdialog extends DialogFragment {
     }
 
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.layout_congrats_dialog, container, false);
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -69,32 +63,8 @@ public class Congratsdialog extends DialogFragment {
 
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        /*get the dialog and set animation with the custom animation created in the anim folder */
-     /*   getDialog().getWindow()
-                .getAttributes().windowAnimations = R.style.DialogAnimation;*/
-    }
 
 
-  /*  @Override public void onStart() {
-        super.onStart();
-
-        Dialog dialog = getDialog();
-
-
-
-        if (dialog != null)
-        {
-            dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-            int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = ViewGroup.LayoutParams.MATCH_PARENT;
-            dialog.getWindow().setLayout(width, height);
-        }
-    }
-*/
 
 
 }

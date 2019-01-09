@@ -2,13 +2,18 @@ package com.quizest.quizestapp.FragmentPackage.DashboardFragments;
 
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Intent;
 import android.icu.util.UniversalTimeScale;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.solver.widgets.Helper;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.ActivityPackage.QuizActivity;
 import com.quizest.quizestapp.AdapterPackage.QuizOptionsRecyclerRow;
 import com.quizest.quizestapp.DialogPackage.Congratsdialog;
@@ -28,49 +34,59 @@ import com.quizest.quizestapp.ModelPackage.QuestionList;
 import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class QuizFragment extends Fragment {
 
-
-    CounterClass counterClass;
+    int count = 0;
     Button btnSkip;
     ImageView ivAnswerA;
-    private static CountDownTimer countDownTimer = null;
-    TextView tv_question_name;
+    Button quiz;
+    TextView tv_question_name, tv_user_point;
     TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
     RecyclerView optionRecyclerView;
     ImageView catStatus, iv_stopwatch;
     QuizOptionsRecyclerRow quizOptionsRecyclerRow;
-
+    private static QuizFragment quizFragment = null;
+    View view;
 
     public QuizFragment() {
         // Required empty public constructor
     }
 
+    public static QuizFragment newInsatance(QuestionList.AvailableQuestionListItem item){
+        Bundle bundleGot = new Bundle();
+        bundleGot.putSerializable(Util.QUESTION, item);
+        QuizFragment fragment = new QuizFragment();
+        fragment.setArguments(bundleGot);
+        return fragment;
+    }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_quiz, container, false);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
     }
 
     @SuppressLint("DefaultLocale")
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
         initViews();
 
+        tv_user_point.setText(String.valueOf(Util.QuizPoint));
+
         if (getActivity() != null && isAdded()) {
-
-
             iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
-            tvQuizPosition.setText(String.format("%d", ((QuizActivity) getActivity()).x++));
+            tvQuizPosition.setText(String.format("%d", ((QuizActivity) getActivity()).x));
             tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
         }
 
@@ -79,99 +95,99 @@ public class QuizFragment extends Fragment {
         if (getArguments() != null) {
             QuestionList.AvailableQuestionListItem questionItem = (QuestionList.AvailableQuestionListItem) getArguments().getSerializable(Util.QUESTION);
             if (questionItem != null) {
-                /*set question name*/
 
-                if(counterClass != null){
-                    counterClass.cancel();
+                TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    tvQuizCount.setText(String.format("/%d", ((QuizActivity) Objects.requireNonNull(getActivity())).questionList.getAvailableQuestionList().size()));
                 }
-                counterClass = new CounterClass(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()), 1000);
-                counterClass.start();
-                //TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
-                tvQuizCount.setText(String.format("/%d", ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()));
-                tv_question_name.setText(questionItem.getTitle());
-                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), catStatus);
-                optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
 
+                tv_question_name.setText(questionItem.getTitle());
+                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), catStatus, tv_user_point);
+                optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
 
 
             }
         }
 
-
-        btnSkip.setOnClickListener(new View.OnClickListener() {
+     btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (getActivity() != null && isAdded()) {
                     if (((QuizActivity) getActivity()).questionList != null) {
-                        if (((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1 == ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()) {
-                            Congratsdialog congratsdialog = new Congratsdialog();
-                            congratsdialog.show(getChildFragmentManager(), "");
-                        } else {
-                            ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
+                        Log.e("size", String.valueOf(((QuizActivity)getActivity()).questionList.getAvailableQuestionList().size()));
+                        if(((QuizActivity)getActivity()).x
+                                < ((QuizActivity)getActivity()).questionList.getAvailableQuestionList().size()){
+                            QuizFragment quizFragment = new QuizFragment();
+                            Bundle bundle = new Bundle();
+                            if(getActivity() != null)
+                            bundle.putSerializable(Util.QUESTION, ((QuizActivity)getActivity()).questionList.getAvailableQuestionList().get(((QuizActivity)getActivity()).x++));
+                            quizFragment.setArguments(bundle);
+
+                            ((QuizActivity)getActivity()).fragmentTransition(quizFragment);
+
+                        }else{
+                            Dialog dialog=new Dialog(getActivity(),android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                            dialog.setContentView(R.layout.layout_congrats_dialog);
+                            TextView tv_result = dialog.findViewById(R.id.tv_result);
+                            quiz = dialog.findViewById(R.id.btn_quiz);
+                            quiz.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                    getActivity().finish();
+                                }
+                            });
+                            tv_result.setText(String.valueOf(Util.TOTAL_POINT));
+                            dialog.show();
                         }
                     }
                 }
             }
         });
+
+
+
+        // Inflate the layout for this fragment
+        return view;
     }
 
-    class CounterClass extends CountDownTimer {
+    @SuppressLint("DefaultLocale")
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        public CounterClass(long millisInFuture, long countDownInterval) {
-            super(millisInFuture, countDownInterval);
-        }
 
-        @Override
-        public void onTick(long millisUntilFinished) {
-
-            /*call this method every one second with reducing 1000 millisecond */
-            if ((millisUntilFinished / 1000) <= 10) {
-                doBlinkAnimation(tv_quiz_time);
-                iv_stopwatch.setImageResource(R.drawable.ic_frown);
-            }
-            setQuizTime(Util.getTimeFromMillisecond(millisUntilFinished));
-        }
-
-        @Override
-        public void onFinish() {
-            removeBlinkAnimation(tv_quiz_time);
-            iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
-            tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
-            if (getActivity() != null && isAdded())
-                Log.e("MKTESTTIME", "HOW MUCH TIME?");
-            ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
-        }
-
-        public void cancelTime(){
-            cancel();
-        }
     }
+
 
     private void TimeCount(long milliseconds) {
-        countDownTimer = new CountDownTimer(milliseconds, 1000) {
-            @Override
-            public void onTick(long l) {
-                /*call this method every one second with reducing 1000 millisecond */
-                if ((l / 1000) <= 10) {
-                    doBlinkAnimation(tv_quiz_time);
-                    iv_stopwatch.setImageResource(R.drawable.ic_frown);
+        if (getActivity() != null)
+            QuizActivity.countDownTimer = new CountDownTimer(milliseconds, 1000) {
+                @Override
+                public void onTick(long l) {
+
+                    if ((l / 1000) <= 10) {
+                        doBlinkAnimation(tv_quiz_time);
+                        iv_stopwatch.setImageResource(R.drawable.ic_frown);
+
+
+                    }
+                    setQuizTime(Util.getTimeFromMillisecond(l));
                 }
-                setQuizTime(Util.getTimeFromMillisecond(l));
-            }
 
-            @Override
-            public void onFinish() {
-                removeBlinkAnimation(tv_quiz_time);
-                iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
-                tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
-                if (getActivity() != null && isAdded())
-                    Log.e("MKTESTTIME", "HOW MUCH TIME?");
-                ((QuizActivity) getActivity()).quizViewPager.setCurrentItem(((QuizActivity) getActivity()).quizViewPager.getCurrentItem() + 1, true);
-
-
-            }
-        };
-        countDownTimer.start();
+                @Override
+                public void onFinish() {
+                    tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
+                    removeBlinkAnimation(tv_quiz_time);
+                    iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
+                     btnSkip.performClick();
+                    cancel();
+                }
+            };
+        QuizActivity.countDownTimer.start();
     }
 
 
@@ -179,8 +195,6 @@ public class QuizFragment extends Fragment {
     private void setQuizTime(HashMap<String, Integer> timeFromMillisecond) {
         if (getActivity() != null && isAdded()) {
             tv_quiz_time.setText(String.format("%s:%s", String.valueOf(timeFromMillisecond.get("min")), String.valueOf(timeFromMillisecond.get("sec"))));
-
-
         }
 
     }
@@ -192,8 +206,8 @@ public class QuizFragment extends Fragment {
     }
 
     private void initViews() {
-        View view = getView();
         if (view != null) {
+            tv_user_point = view.findViewById(R.id.tv_user_point);
             catStatus = view.findViewById(R.id.img_cat_status);
             tv_quiz_time = view.findViewById(R.id.tv_quiz_time);
             tvQuizCount = view.findViewById(R.id.tv_quiz_count);
@@ -220,11 +234,13 @@ public class QuizFragment extends Fragment {
         textView.clearAnimation();
     }
 
+
     @Override
     public void onDestroyView() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
+        if (getActivity() != null)
+            if (QuizActivity.countDownTimer != null) {
+                QuizActivity.countDownTimer.cancel();
+            }
         super.onDestroyView();
     }
 

@@ -2,6 +2,8 @@ package com.quizest.quizestapp.ActivityPackage;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.v4.view.ViewPager;
@@ -16,6 +18,7 @@ import com.quizest.quizestapp.R;
 import com.rd.PageIndicatorView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -32,6 +35,18 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         //*make the statusbar transparent if version is above kitkat*//*
+
+
+        Locale locale = Locale.getDefault();
+        Resources resources =this.getResources();
+        Configuration config = resources.getConfiguration();
+        config.locale = locale;
+        if (Build.VERSION.SDK_INT >= 17) {
+            config.setLayoutDirection(locale);
+        }
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
+
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 

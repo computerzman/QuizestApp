@@ -52,14 +52,14 @@
 
 
 
-        <com.quizest.quizestapp.CustomViews.CustomViewPager
+        <FrameLayout
             android:id="@+id/vp_quiz"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="22dp">
 
 
-        </com.quizest.quizestapp.CustomViews.CustomViewPager>
+        </FrameLayout>
 
 
 

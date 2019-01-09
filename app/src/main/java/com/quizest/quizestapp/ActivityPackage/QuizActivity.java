@@ -3,8 +3,10 @@ package com.quizest.quizestapp.ActivityPackage;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,10 +43,14 @@ import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
+    Fragment currentFragment;
    public QuestionList questionList;
-    public CustomViewPager quizViewPager;
+
     List<Fragment> quizList;
-    public int x  = 0;
+    public int x  =
+            1;
+    public int c = 1;
+    public static CountDownTimer countDownTimer;
     QuizViewPagerAdapter quizViewPagerAdapter;
 
     @Override
@@ -57,7 +63,7 @@ public class QuizActivity extends AppCompatActivity {
 
         quizList = new ArrayList<>();
 
-        initView();
+
 
 
         String QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
@@ -65,30 +71,10 @@ public class QuizActivity extends AppCompatActivity {
             getQuestionList(QUESTION_ID);
         }
 
-        ViewPager.PageTransformer transformer = new ViewPager.PageTransformer() {
-            @Override
-            public void transformPage(@NonNull View view, float position) {
-                if (position <= -1.0F || position >= 1.0F) {
-                    view.setTranslationX(view.getWidth() * position);
-                    view.setAlpha(0.0F);
-                } else if (position == 0.0F) {
-                    view.setTranslationX(view.getWidth() * position);
-                    view.setAlpha(1.0F);
-                } else {
-                    // position is between -1.0F & 0.0F OR 0.0F & 1.0F
-                    view.setTranslationX(view.getWidth() * -position);
-                    view.setAlpha(1.0F - Math.abs(position));
-                }
-            }
-        };
 
-        quizViewPager.setPageTransformer(false, transformer);
     }
 
 
-    private void initView() {
-        quizViewPager = findViewById(R.id.vp_quiz);
-    }
 
     @Override
     public void onBackPressed() {
@@ -120,23 +106,21 @@ public class QuizActivity extends AppCompatActivity {
                             questionList = gson.fromJson(response.body(), QuestionList.class);
 
 
-                            /*set available question list size*/
-                         //
 
-                            for (QuestionList.AvailableQuestionListItem questions : questionList.getAvailableQuestionList()) {
-                                Bundle bundle = new Bundle();
-                                bundle.putSerializable(Util.QUESTION, (Serializable) questions);
-                                Fragment fragment = new QuizFragment();
-                                fragment.setArguments(bundle);
-                                quizList.add(fragment);
-
-                                /*build view pager with option list */
-                                quizViewPagerAdapter = new QuizViewPagerAdapter(getSupportFragmentManager(), quizList, QuizActivity.this);
-                                quizViewPager.setAdapter(quizViewPagerAdapter);
-                                quizViewPager.setPagingEnabled(false);
-
-
+                            if(questionList != null){
+                                if(questionList.getAvailableQuestionList().size() != 0){
+                                    QuizFragment quizFragment = new QuizFragment();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putSerializable(Util.QUESTION, questionList.getAvailableQuestionList().get(0));
+                                    quizFragment.setArguments(bundle);
+                                    fragmentTransition(quizFragment);
+                                }else{
+                                    Toast.makeText(QuizActivity.this, "NO Question Found!", Toast.LENGTH_SHORT).show();
+                                }
                             }
+
+
+
                             /*dismiss the dialog*/
                             Util.dissmisDialog(dialog);
                         } else {
@@ -168,4 +152,14 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void fragmentTransition(Fragment fragment) {
+        this.currentFragment = fragment;
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        fragmentTransaction.replace(R.id.vp_quiz, fragment);
+        fragmentTransaction.commit();
+    }
+
+
 }

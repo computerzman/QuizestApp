@@ -14,6 +14,9 @@ public class SubmitAnswer implements Serializable {
     @SerializedName("success")
     private boolean success;
 
+    @SerializedName("score")
+    private String score;
+
     @SerializedName("message")
     private String message;
 
@@ -27,6 +30,10 @@ public class SubmitAnswer implements Serializable {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getScore() {
+        return score;
     }
 
     public class RightAnswer implements Serializable {
