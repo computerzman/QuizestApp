@@ -42,5 +42,10 @@ public interface RetrofitInterface {
     Call<String> getProfileData(@Header("Authorization")String token);
 
 
+    @GET("user-setting")
+    Call<String>getUserSetting(@Header("Authorization")String token);
 
+    @FormUrlEncoded
+    @POST("save-user-setting")
+    Call<String> postUserLang(@Header("Authorization")String token, @Field("language")String lang);
 }

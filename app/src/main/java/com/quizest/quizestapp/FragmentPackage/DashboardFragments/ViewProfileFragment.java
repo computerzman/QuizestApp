@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.google.gson.Gson;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
+import com.quizest.quizestapp.ActivityPackage.SettingActivity;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.ProfileSection;
 import com.quizest.quizestapp.ModelPackage.UserLogIn;
@@ -50,11 +52,10 @@ import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
- *
  */
 public class ViewProfileFragment extends Fragment {
 
-    ImageButton btnEditProfile;
+    ImageButton btnEditProfile, button_setting_profile;
     LineChart graphQuizReport;
     ImageView img_profile;
     ArrayList<Entry> lineChatEntryData;
@@ -91,6 +92,17 @@ public class ViewProfileFragment extends Fragment {
             public void onClick(View view) {
                 if (getActivity() != null && isAdded())
                     ((MainActivity) getActivity()).fragmentTransition(new EditProfileFragment());
+            }
+        });
+
+        button_setting_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                startActivity(intent);
+                if(getActivity() != null)
+                getActivity().overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+                getActivity().finish();
             }
         });
 
@@ -149,9 +161,10 @@ public class ViewProfileFragment extends Fragment {
             }
         });
 
-        graphQuizReport.setVisibleYRange(0, 100, YAxis.AxisDependency.LEFT);
+        graphQuizReport.setVisibleYRangeMaximum(200, YAxis.AxisDependency.LEFT);
+        //gr//aphQuizReport.setVisibleYRange(0, 100, YAxis.AxisDependency.LEFT);
         graphQuizReport.getAxisRight().setEnabled(false);
-        graphQuizReport.getAxisLeft().setEnabled(false);
+        //graphQuizReport.getAxisLeft().setEnabled(false);
         graphQuizReport.getAxisLeft().setDrawGridLines(false);
         graphQuizReport.getXAxis().setDrawGridLines(false);
 
@@ -162,6 +175,7 @@ public class ViewProfileFragment extends Fragment {
     private void initViews() {
         View view = getView();
         if (view != null) {
+            button_setting_profile = view.findViewById(R.id.button_setting_profile);
             userEmail = view.findViewById(R.id.tv_user_email);
             userName = view.findViewById(R.id.tv_profile_username);
             userPoints = view.findViewById(R.id.tv_user_points);
@@ -176,7 +190,7 @@ public class ViewProfileFragment extends Fragment {
         final ProgressDialog dialog = Util.showDialog(getActivity());
         Storage storage = new Storage(getActivity());
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
-        final Call<String> profileCall = retrofitInterface.getProfileData("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImZiNmM3OTIzNWEzNGZlMTFiMWE4YTVjMWY0ZTVjZjA2YTVkOWZiYjY5YzUzMWRlMjY3YWJmZDM4NjdmN2MzM2YwNDQwMjA2NDViZWI2MjQ1In0.eyJhdWQiOiIxIiwianRpIjoiZmI2Yzc5MjM1YTM0ZmUxMWIxYThhNWMxZjRlNWNmMDZhNWQ5ZmJiNjljNTMxZGUyNjdhYmZkMzg2N2Y3YzMzZjA0NDAyMDY0NWJlYjYyNDUiLCJpYXQiOjE1NDY2NzI0NDQsIm5iZiI6MTU0NjY3MjQ0NCwiZXhwIjoxNTc4MjA4NDQ0LCJzdWIiOiI4Iiwic2NvcGVzIjpbXX0.i2h_5F-OL5sQ0sW5LrXfRJdm9g2a2aa7d6GX1toM4aP2KRQIJPP85HbT9N0Rx1HYB3GpobPSzl77dUWQ0SNv3wwqTdrYBTEx38RlhIqjEnCIUDcCCimjDqEIENGLzokeCIWrbZEdrFRZBvdAdfKkQApADp22tY3eHCdd64Lx8vibDkZV9BrRduJvJogKwqULZ4VHF4rkU9N_ZF4ukvImbWbTn3VIg9McdwDKViDVY3kG_bttp2vGFw1djJZVNA4juoeVf6N5CeH5AO65mkLjuHdr2FZyF1tVMnjjMSRpGhWrJdiGyo1-72HJxG3O7qVQWA8KSz7jSVQB3BnK0SBRCqly58OiKcVHTNaOa0ubEHCFE4oP_ISzP8u2HUQJZSrWyP1qDjxQwYTG5BPxVFPGsZzg4FbsnSQ5eDtXWkvXNQjVgb879hRHC2Wl1BAtVacp6j0ED7ClPapt83y0Df3DSbjYHKBZlNzsHMwrY0i5PgeaLnDGMMWxPUn2GClJVNO7DEmJb3XqQsn2zbJknYhwuByM-5vrZH9G31ckK6qcjTSCHZYMKFC5ejFxJrU3opYNZuxl9UbbTqoCjbfTbSDWY4wrht65WM-dwt1D-WWibOGktwF8M2jY-ErEkNGJ2u-fRs5SPjQ_Mbkyo94DaRknJGgpFJcROaxg0qunfN0q6zM");
+        final Call<String> profileCall = retrofitInterface.getProfileData(storage.getAccessToken());
         profileCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -198,14 +212,16 @@ public class ViewProfileFragment extends Fragment {
                             userName.setText(profileSection.getData().getUser().getName());
                             userPoints.setText(profileSection.getData().getUser().getPoints());
                             userRanking.setText(String.valueOf(profileSection.getData().getUser().getRanking()));
-                            if(getActivity() != null)
-                            GlideApp.with(getActivity()).load(profileSection.getData().getUser().getPhoto()).into(img_profile);
+                            if (getActivity() != null)
+                                GlideApp.with(getActivity()).load(profileSection.getData().getUser().getPhoto()).into(img_profile);
 
                             /*make the chart*/
                             for (int i = 0; i < profileSection.getDailyScore().size(); i++) {
                                 lineChatEntryData.add(new Entry(i, Math.round((float) profileSection.getDailyScore().get(i).getScorePercentage())));
+                                Log.e("MKTESTGRAPH", String.valueOf(Math.round((float) profileSection.getDailyScore().get(i).getScorePercentage())));
                                 lebels.add(Util.getFormattedDate(profileSection.getDailyScore().get(i).getDate()));
                             }
+
 
                             chartBuilder(lebels, lineChatEntryData);
 

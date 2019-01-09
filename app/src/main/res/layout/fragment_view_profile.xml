@@ -45,6 +45,7 @@
             <ImageButton
                 android:layout_width="35dp"
                 android:layout_height="35dp"
+                android:id="@+id/button_setting_profile"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="8dp"
                 android:background="@android:color/transparent"
