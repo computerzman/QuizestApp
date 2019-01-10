@@ -35,6 +35,26 @@
             android:parentActivityName=".ActivityPackage.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ActivityPackage.SettingActivity" android:parentActivityName=".ActivityPackage.MainActivity" android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <service android:name=".FirebasePackage.FirebaseIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+
+
+
+        <service android:name=".FirebasePackage.FirebaseMessangingService">
+
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
     </application>
 
 </manifest>

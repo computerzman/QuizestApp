@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
+    ImageButton btn_back, btnSetting;
     Fragment currentFragment;
     public QuestionList questionList;
 
@@ -60,6 +62,32 @@ public class QuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
+
+
+        btn_back = findViewById(R.id.btn_back);
+        btnSetting = findViewById(R.id.btn_setting);
+
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(QuizActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                QuizActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+                finish();
+            }
+        });
+
+
+        btnSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(QuizActivity.this, SettingActivity.class);
+                startActivity(intent);
+                QuizActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+                finish();
+            }
+        });
 
         Util.TOTAL_POINT = 0;
 
@@ -160,7 +188,7 @@ public class QuizActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         fragmentTransaction.replace(R.id.vp_quiz, fragment);
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
 

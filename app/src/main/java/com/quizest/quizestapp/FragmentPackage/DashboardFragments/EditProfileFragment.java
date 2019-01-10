@@ -209,12 +209,10 @@ public class EditProfileFragment extends Fragment {
             if (resultCode == Activity.RESULT_OK) {
                 if(data != null){
                     file  = new File(ImageFilePath.getPath(getActivity(), data.getData()));
-                    try {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
-                        profileImage.setImageBitmap(bitmap);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
+                    if(getActivity() != null)
+                    GlideApp.with(getActivity()).load(data.getData()).into(profileImage);
+
                 }else{
                     Toast.makeText(getActivity(), "No Data found", Toast.LENGTH_SHORT).show();
                 }

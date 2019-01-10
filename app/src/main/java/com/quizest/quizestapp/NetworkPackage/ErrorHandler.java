@@ -28,16 +28,19 @@ public class ErrorHandler extends Application {
     public void handleError(int code, Activity activity, ProgressDialog dialog) {
         switch (code) {
             case 500:
+                if(activity != null)
                 Toast.makeText(activity, "Something Went Wrong!", Toast.LENGTH_SHORT).show();
                 Util.dissmisDialog(dialog);
                 break;
 
             case 400:
+                if(activity != null)
                 Toast.makeText(activity, "Invalid Request!", Toast.LENGTH_SHORT).show();
                 Util.dissmisDialog(dialog);
                 break;
 
             case 429:
+                if(activity != null)
                 Toast.makeText(activity, "Too Many Request, Please Try Again Later!", Toast.LENGTH_SHORT).show();
                 Util.dissmisDialog(dialog);
                 break;

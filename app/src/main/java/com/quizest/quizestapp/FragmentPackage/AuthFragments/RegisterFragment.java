@@ -128,6 +128,33 @@ public class RegisterFragment extends Fragment {
         }
     }
 
+    private void addUserToFireBase(){
+        Storage storage = new Storage(activity);
+        RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
+       Call<String> tokenCall =  retrofitInterface.addUserToFirebase(storage.getAccessToken(), storage.getUserId(), storage.getFirebaseToken());
+       tokenCall.enqueue(new Callback<String>() {
+           @Override
+           public void onResponse(Call<String> call, Response<String> response) {
+               if(response.isSuccessful()){
+
+
+               }else {
+                   Toast.makeText(activity, "Failed to add you in Firebase!", Toast.LENGTH_SHORT).show();
+               }
+           }
+
+           @Override
+           public void onFailure(Call<String> call, Throwable t) {
+
+               /*handle network error and notify the user*/
+               if (t instanceof SocketTimeoutException || t instanceof IOException) {
+                   Toast.makeText(activity, R.string.connection_timeout, Toast.LENGTH_SHORT).show();
+               }
+           }
+       });
+
+    }
+
 
     private void doRegistration(String name, String email, String phone, String password, String confirmPassword) {
         final ProgressDialog dialog = Util.showDialog(activity);
@@ -148,7 +175,9 @@ public class RegisterFragment extends Fragment {
                             /*serialize the String response  */
                             Gson gson = new Gson();
                             UserRegistration userRegistration = gson.fromJson(response.body(), UserRegistration.class);
-                            /*save the user data to local storage*/
+                            /*save theuser data to local storage*/
+                            storage.saveUserId(userRegistration.getData().getUserInfo().getId());
+                            storage.saveUserName(userRegistration.getData().getUserInfo().getName());
                             storage.SaveAccessToken(userRegistration.getData().getAccessToken());
                             storage.SaveAccessType(userRegistration.getData().getAccessType());
                             storage.SaveLogInSate(true);

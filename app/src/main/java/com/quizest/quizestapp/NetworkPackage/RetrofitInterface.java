@@ -61,4 +61,7 @@ public interface RetrofitInterface {
     Call<String> updateProfile(@Header("Authorization") String token
             , @Part("name") RequestBody name, @Part("country") RequestBody country, @Part("phone") RequestBody phone, @Part MultipartBody.Part image
     );
+
+    @GET("set-user-device-id")
+    Call<String> addUserToFirebase(@Header("Authorization")String token, @Query("user_id")int userId, @Query("device_id") String id);
 }

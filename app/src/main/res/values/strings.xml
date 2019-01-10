@@ -17,4 +17,5 @@
     <string name="password_not_match">Password And Confirm Password doesn\'t match!</string>
     <string name="no_internet">No Internet, Try again Later!</string>
     <string name="no_data_found">Data Not Found!</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>

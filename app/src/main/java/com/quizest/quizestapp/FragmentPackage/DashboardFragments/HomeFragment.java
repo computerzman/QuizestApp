@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -45,6 +46,7 @@ import retrofit2.Response;
  */
 public class HomeFragment extends Fragment {
 
+    TextView tvUserName;
     Activity activity;
     List<CategoryModel> categoryModels;
     CategoryRecyclerAdapter categoryRecyclerAdapter;
@@ -74,6 +76,10 @@ public class HomeFragment extends Fragment {
         if (getActivity() != null) {
             activity = getActivity();
         }
+
+        Storage storage = new Storage(activity);
+        tvUserName.setText(String.format("Hello %s, \nWelcome back ", Util.getFormattedDate(storage.getUserName())));
+
         /*adding options to category recycler*/
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         categoryRecycler.setHasFixedSize(true);
@@ -147,6 +153,7 @@ public class HomeFragment extends Fragment {
     private void initViews() {
         View view = getView();
         if (view != null) {
+            tvUserName = view.findViewById(R.id.tv_username);
             categoryRecycler = view.findViewById(R.id.recycler_categories);
         }
     }

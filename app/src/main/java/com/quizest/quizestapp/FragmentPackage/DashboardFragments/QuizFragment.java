@@ -125,6 +125,7 @@ public class QuizFragment extends Fragment {
                         Toast.makeText(getActivity(), "sorry, Play first!", Toast.LENGTH_SHORT).show();
                     }
                 } catch (NullPointerException e) {
+
                     Toast.makeText(getActivity(), "sorry, Play first!", Toast.LENGTH_SHORT).show();
                 }
 

@@ -7,7 +7,10 @@ public class Storage {
 
     private static final boolean isSoundEnabled = true;
     private static final boolean LOGIN_SATE = false;
+    private static final int USERID = 1;
     private static final String ACCESS_TOKEN = null;
+    private static final String USERNAME = null;
+    private static final String FIREBASE_TOKEN = null ;
     private static final String ACCESS_TYPE = "Bearer";
     private Context context;
 
@@ -54,6 +57,14 @@ public class Storage {
 
     }
 
+    public void saveUserName(String name){
+        getPreferencesEditor().putString("name", name).commit();
+    }
+
+    public String getUserName(){
+        return getsharedPreferences().getString("name" , USERNAME);
+    }
+
     public String getAccessType() {
 
         return getsharedPreferences().getString("type", ACCESS_TYPE);
@@ -65,6 +76,25 @@ public class Storage {
 
     public boolean getSoundState() {
         return getsharedPreferences().getBoolean("sound", isSoundEnabled);
+    }
+
+    public String getFirebaseToken() {
+
+        return getsharedPreferences().getString("fire_token", FIREBASE_TOKEN);
+    }
+
+    public void SaveFirebaseToken(String token) {
+
+        getPreferencesEditor().putString("fire_token", token).commit();
+
+    }
+
+    public void saveUserId(int i){
+        getPreferencesEditor().putInt("id", i).commit();
+    }
+
+    public int getUserId(){
+        return getsharedPreferences().getInt("id", USERID);
     }
 
 }
