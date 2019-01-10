@@ -41,6 +41,7 @@ public class Util {
     public static int LAST_GRADIENT = 0;
 
 
+    /*get file compressed*/
     public static File getCompressedFile(File file, Context context) {
         File compressedImageFile = null;
         try {
