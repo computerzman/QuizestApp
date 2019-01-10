@@ -37,6 +37,7 @@ import retrofit2.Response;
 
 public class SettingActivity extends AppCompatActivity {
 
+/*all global field instances are here*/
     Switch sound;
     UserSetting userSetting;
     String[] langSettingInArray;
@@ -44,18 +45,23 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_setting);
 
+        /**/
         final Storage storage = new Storage(this);
 
+        /*view type casting*/
         sound = findViewById(R.id.sw_sound);
 
+        /*check the state of sound and set value upon it the setting*/
         if (storage.getSoundState()) {
             sound.setChecked(true);
         } else {
             sound.setChecked(false);
         }
 
+        /*change the state of the sound on user input*/
         sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -67,6 +73,8 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
+
+        /*get the language list from server*/
         getUserSetting();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -82,9 +90,10 @@ public class SettingActivity extends AppCompatActivity {
         }
     }
 
+    /*show the dialog of current language list*/
     public void onChangeLang(View view) {
         if (userSetting == null) {
-            /*again call to get the country list*/
+            /*again call to get the language list*/
             getUserSetting();
 
             final AlertDialog.Builder showNoDataFound = new AlertDialog.Builder(SettingActivity.this);
@@ -113,6 +122,8 @@ public class SettingActivity extends AppCompatActivity {
 
     }
 
+
+    /*when user press the back button take him to the main activity*/
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(SettingActivity.this, MainActivity.class);
@@ -120,6 +131,8 @@ public class SettingActivity extends AppCompatActivity {
         finish();
     }
 
+
+    /*update the language of the app by taking input of language key*/
     private void postUserLang(String langKey) {
         Storage storage = new Storage(SettingActivity.this);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
@@ -164,6 +177,8 @@ public class SettingActivity extends AppCompatActivity {
         });
     }
 
+
+    /*the langeuage list of setting*/
     private void getUserSetting() {
         Storage storage = new Storage(this);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);

@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.ActivityPackage.SettingActivity;
 import com.quizest.quizestapp.AdapterPackage.LeaderboardRecyclerAdapter;
 import com.quizest.quizestapp.LocalStorage.Storage;
@@ -57,11 +59,12 @@ import retrofit2.Response;
  */
 public class EditProfileFragment extends Fragment {
 
+    /*global field instances*/
     private File file;
     private int PICK_IMAGE = 1;
     CircleImageView profileImage;
     TextView tvRanking, tvPoint, tvName, tvEmail;
-    ImageButton btn_setting_edit, btn_pick_image;
+    ImageButton btn_setting_edit, btn_pick_image, btn_back_edit;
     EditText edtUserName;
     EditText CountryName, Phone;
     Button btnSave;
@@ -96,6 +99,14 @@ public class EditProfileFragment extends Fragment {
             }
         });
 
+        btn_back_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getActivity() != null && isAdded())
+                    ((MainActivity) getActivity()).fragmentTransition(new ViewProfileFragment());
+            }
+        });
+
         btn_pick_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,7 +128,7 @@ public class EditProfileFragment extends Fragment {
                         if (Phone.getText().toString().length() != 0) {
 
                             if (file != null) {
-                                updateProfile(edtUserName.getText().toString(), Phone.getText().toString(), CountryName.getText().toString(), file);
+                                updateProfile(edtUserName.getText().toString(), Phone.getText().toString(), CountryName.getText().toString(), Util.getCompressedFile(file, getActivity()));
                             } else {
                                 Toast.makeText(getActivity(), "Select Image First", Toast.LENGTH_SHORT).show();
                             }
@@ -172,6 +183,9 @@ public class EditProfileFragment extends Fragment {
 
                             Util.dissmisDialog(dialog);
 
+                            if (getActivity() != null && isAdded())
+                                ((MainActivity) getActivity()).fragmentTransition(new ViewProfileFragment());
+
                         } else {
                             /*dismiss the dialog*/
                             Util.dissmisDialog(dialog);
@@ -194,8 +208,13 @@ public class EditProfileFragment extends Fragment {
             public void onFailure(Call<String> call, Throwable t) {
                 /*dismiss the dialog*/
                 Util.dissmisDialog(dialog);
+
+                if(t instanceof  IOException){
+                    Log.e("MKIO", t.getMessage());
+                }
                 /*handle network error and notify the user*/
-                if (t instanceof SocketTimeoutException || t instanceof IOException) {
+                if (t instanceof SocketTimeoutException) {
+
                     if (getActivity() != null && isAdded())
                         Toast.makeText(getActivity(), R.string.connection_timeout, Toast.LENGTH_SHORT).show();
                 }
@@ -203,6 +222,8 @@ public class EditProfileFragment extends Fragment {
         });
     }
 
+
+    /*get the returned image*/
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE) {
@@ -213,12 +234,8 @@ public class EditProfileFragment extends Fragment {
                     if(getActivity() != null)
                     GlideApp.with(getActivity()).load(data.getData()).into(profileImage);
 
-                }else{
-                    Toast.makeText(getActivity(), "No Data found", Toast.LENGTH_SHORT).show();
                 }
 
-            } else {
-                Toast.makeText(getActivity(), "Something Went wrong!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -258,6 +275,7 @@ public class EditProfileFragment extends Fragment {
     private void initViews() {
         View view = getView();
         if (view != null) {
+            btn_back_edit = view.findViewById(R.id.btn_back_edit);
             btnSave = view.findViewById(R.id.btn_save);
             btn_pick_image = view.findViewById(R.id.btn_pick_image);
             profileImage = view.findViewById(R.id.img_edit_profile);
@@ -272,6 +290,8 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
+
+    /*get the profile data from the api*/
     private void getProfileData() {
         final ProgressDialog dialog = Util.showDialog(getActivity());
         Storage storage = new Storage(getActivity());

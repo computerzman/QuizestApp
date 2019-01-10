@@ -18,6 +18,7 @@ public class ErrorHandler extends Application {
         super.onCreate();
     }
 
+    /*make the error handler class singleton*/
     public static synchronized ErrorHandler getInstance() {
         if (mInstance == null) {
             mInstance = new ErrorHandler();
@@ -25,6 +26,8 @@ public class ErrorHandler extends Application {
         return mInstance;
     }
 
+
+    /*handle error globally by checking the http code*/
     public void handleError(int code, Activity activity, ProgressDialog dialog) {
         switch (code) {
             case 500:
@@ -56,6 +59,7 @@ public class ErrorHandler extends Application {
     }
 
 
+    /*take user to Auth Activity*/
     private void goToLogInActivity(Activity activity) {
         /*make the current user logged out*/
         Storage storage = new Storage(activity);

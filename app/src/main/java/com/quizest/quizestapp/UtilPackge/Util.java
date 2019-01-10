@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.quizest.quizestapp.R;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -24,6 +26,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import id.zelory.compressor.Compressor;
 
 public class Util {
 
@@ -35,6 +39,19 @@ public class Util {
     public static String REQUEST_TYPE = "application/json";
     private static int UPPER_BOUND = 7;
     public static int LAST_GRADIENT = 0;
+
+
+    public static File getCompressedFile(File file, Context context) {
+        File compressedImageFile = null;
+        try {
+            compressedImageFile = new Compressor(context).compressToFile(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return compressedImageFile;
+    }
+
 
     /*this method disable shifting Animation of bottom navigation bar*/
     public static void removeShiftMode(BottomNavigationView view) {
@@ -228,6 +245,7 @@ public class Util {
         return false;
     }
 
+    /*show the dialog*/
     public static ProgressDialog showDialog(Activity activity) {
         ProgressDialog dialog = new ProgressDialog(activity);
         dialog.setMessage("Loading...");
@@ -236,6 +254,7 @@ public class Util {
     }
 
 
+    /*dismis the dialog*/
     public static void dissmisDialog(ProgressDialog dialog) {
         if (dialog.isShowing()) {
             dialog.dismiss();

@@ -7,6 +7,8 @@
     android:orientation="vertical"
     tools:context=".FragmentPackage.DashboardFragments.EarnCoinFragment">
 
+
+    <!--this is a static section if the customer wants to use this section he need to develop this section in admit panel and then need to make it dynamic-->
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -384,6 +386,12 @@
         </LinearLayout>
 
 
+
+
     </LinearLayout>
+
+
+
+
 
 </LinearLayout>

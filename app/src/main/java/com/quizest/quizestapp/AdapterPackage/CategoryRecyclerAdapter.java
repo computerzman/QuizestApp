@@ -25,15 +25,18 @@ import java.util.List;
 
 public class CategoryRecyclerAdapter extends RecyclerView.Adapter<CategoryRecyclerAdapter.CategoryHolder> {
 
+    /*all global field instances*/
     private Activity activity;
     private List<CategoryList.CategoryListItem> categoryModelList;
 
-
+    /*this is the constructor for the Category */
     public CategoryRecyclerAdapter(List<CategoryList.CategoryListItem> categoryModelList, Activity activity) {
         this.categoryModelList = categoryModelList;
         this.activity = activity;
     }
 
+
+    /*here all row layout get inflated*/
     @NonNull
     @Override
     public CategoryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,6 +44,8 @@ public class CategoryRecyclerAdapter extends RecyclerView.Adapter<CategoryRecycl
         return new CategoryHolder(view);
     }
 
+
+    /*here all data binding happens*/
     @Override
     public void onBindViewHolder(@NonNull CategoryHolder holder, int position) {
         holder.categoryName.setText(categoryModelList.get(position).getName());
@@ -48,11 +53,14 @@ public class CategoryRecyclerAdapter extends RecyclerView.Adapter<CategoryRecycl
         holder.categoryBackgroundImage.setImageResource(Util.getRandomCategoryGradient(Util.generateRandom(Util.LAST_GRADIENT)));
     }
 
+
+//    get the count of the list
     @Override
     public int getItemCount() {
         return categoryModelList.size();
     }
 
+    /*this is the custom view holder class for recycler view */
 
     class CategoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -67,6 +75,8 @@ public class CategoryRecyclerAdapter extends RecyclerView.Adapter<CategoryRecycl
             categoryBackgroundImage = itemView.findViewById(R.id.iv_category_bg);
         }
 
+
+//        if user clicks on any category then take him to the Quiz acitivty
         @Override
         public void onClick(View view) {
             Intent intent = new Intent(activity, QuizActivity.class);

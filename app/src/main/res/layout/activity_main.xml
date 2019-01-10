@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ActivityPackage.MainActivity">
 
-
+<!--top section of the main activity-->
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/top_panel"
@@ -63,6 +63,7 @@
 
     </LinearLayout>
 
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -73,6 +74,7 @@
 
     </FrameLayout>
 
+    <!--bottom view-->
     <android.support.design.widget.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"

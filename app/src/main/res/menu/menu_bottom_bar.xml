@@ -20,7 +20,7 @@
     <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/selector_bottomview_profile"
-        android:title="Team"/>
+        android:title="Profile"/>
 
 
 </menu>

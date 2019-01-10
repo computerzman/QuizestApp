@@ -50,6 +50,7 @@ import retrofit2.Response;
  */
 public class LogInFragment extends Fragment {
 
+    /*global field instances*/
     EditText edtEmail, edtPassword;
     TextView tvLogInChangePassword, tvLogInSignUp;
     Button btnSignIn;
@@ -79,8 +80,11 @@ public class LogInFragment extends Fragment {
         if (getActivity() != null && isAdded()) {
             activity = getActivity();
         }
+
+        /*view type casting*/
         initViews();
 
+        /*sign up button click*/
         tvLogInSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,6 +95,7 @@ public class LogInFragment extends Fragment {
         });
 
 
+        /*change password button click*/
         tvLogInChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,6 +106,7 @@ public class LogInFragment extends Fragment {
         });
 
 
+//        action for the sign in button click
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -124,6 +130,7 @@ public class LogInFragment extends Fragment {
     }
 
 
+    /*log in api call*/
     private void doLogIn(String email, String password) {
         final Storage storage = new Storage(activity);
         final ProgressDialog dialog = Util.showDialog(activity);
@@ -185,6 +192,8 @@ public class LogInFragment extends Fragment {
         });
     }
 
+
+    /*view type casting*/
     private void initViews() {
         View view = getView();
         if (view != null) {

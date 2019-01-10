@@ -188,7 +188,7 @@ public class ViewProfileFragment extends Fragment {
 
     private void getProfileData() {
         final ProgressDialog dialog = Util.showDialog(getActivity());
-        Storage storage = new Storage(getActivity());
+        final Storage storage = new Storage(getActivity());
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
         final Call<String> profileCall = retrofitInterface.getProfileData(storage.getAccessToken());
         profileCall.enqueue(new Callback<String>() {
@@ -206,7 +206,7 @@ public class ViewProfileFragment extends Fragment {
                             /*serialize the String response  */
                             Gson gson = new Gson();
                             ProfileSection profileSection = gson.fromJson(response.body(), ProfileSection.class);
-
+                            storage.saveUserName(profileSection.getData().getUser().getName());
                             /*simple data binding for profile section*/
                             userEmail.setText(profileSection.getData().getUser().getEmail());
                             userName.setText(profileSection.getData().getUser().getName());
@@ -254,6 +254,7 @@ public class ViewProfileFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
+                    if(getActivity()!=null)
                     /*dismiss the dialog*/
                     Util.dissmisDialog(dialog);
                     Toast.makeText(getActivity(), R.string.no_data_found, Toast.LENGTH_SHORT).show();

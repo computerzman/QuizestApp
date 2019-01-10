@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.ads.MobileAds;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.EarnCoinFragment;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.LeaderBoardFragment;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.HomeFragment;
@@ -31,6 +32,7 @@ import com.quizest.quizestapp.UtilPackge.Util;
 
 public class MainActivity extends AppCompatActivity {
 
+    /*all global field instances are here*/
 
     BottomNavigationView bv_BottomBar;
     ImageButton btn_logout, btn_setting;
@@ -42,14 +44,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*add the layout file to the activity*/
         setContentView(R.layout.activity_main);
 
 
+        /*admob initialization*/
 
+        // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
+        MobileAds.initialize(this, getResources().getString(R.string.admob_id));
+
+
+
+        /*all permision need for this app*/
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
         };
+
+
+        /*check if the there is permission that is needed*/
 
         if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
@@ -107,30 +121,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /*change the fragment on bottom bar item click*/
         bv_BottomBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
+                        /*replace with home fragment*/
                         RestMode();
                         if (!(currentFragment instanceof HomeFragment))
                             currentFragment = new HomeFragment();
                         break;
                     case R.id.navigation_earncoin:
                         RestMode();
+                        /*replace with Earn coin fragment*/
                         currentFragment
                                 = new EarnCoinFragment();
                         break;
                     case R.id.navigation_profile:
                         profileMode();
+                        /*replace with viewprofile fragment*/
                         currentFragment = new ViewProfileFragment();
                         break;
                     case R.id.navigation_leaderboard:
                         RestMode();
+                        /*replace with home Leaderboard*/
                         if (!(currentFragment instanceof LeaderBoardFragment))
                             currentFragment = new LeaderBoardFragment();
                         break;
                 }
+
+                /*do the main fragment transition*/
                 fragmentTransition(currentFragment);
                 return true;
             }
@@ -139,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /*check if the app have all permissions*/
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
@@ -151,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /*if user is in profile fragment make the status bar color blue*/
     private void profileMode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.color_holo_blue));// SDK21
@@ -176,6 +199,8 @@ public class MainActivity extends AppCompatActivity {
         topPanel.setVisibility(View.VISIBLE);
     }
 
+
+/*replace the current fragment with new fragment*/
     public void fragmentTransition(Fragment fragment) {
         this.currentFragment = fragment;
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -185,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /*type casting all the view*/
     private void initviews() {
         topPanel = findViewById(R.id.top_panel);
         bv_BottomBar = findViewById(R.id.bv_bottom_bar);

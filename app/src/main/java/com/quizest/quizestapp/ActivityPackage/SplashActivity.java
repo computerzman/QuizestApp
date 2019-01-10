@@ -12,10 +12,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+
 import com.quizest.quizestapp.AdapterPackage.ImageSliderAdapter;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.R;
 import com.rd.PageIndicatorView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -36,17 +38,7 @@ public class SplashActivity extends AppCompatActivity {
 
         //*make the statusbar transparent if version is above kitkat*//*
 
-
-        Locale locale = Locale.getDefault();
-        Resources resources =this.getResources();
-        Configuration config = resources.getConfiguration();
-        config.locale = locale;
-        if (Build.VERSION.SDK_INT >= 17) {
-            config.setLayoutDirection(locale);
-        }
-        resources.updateConfiguration(config, resources.getDisplayMetrics());
-
-
+        /*make the status bar transparent*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
@@ -60,6 +52,7 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
 
+        /*view type casting*/
         initViews();
 
 
@@ -78,11 +71,13 @@ public class SplashActivity extends AppCompatActivity {
 
         pageIndicatorView.setViewPager(vpSplashPager);
 
-
+        /*set count viewpager indicator*/
         pageIndicatorView.setCount(3);
 
+        /*set indicator the current position from the viewpager*/
         pageIndicatorView.setSelection(vpSplashPager.getCurrentItem());
 
+        /*view pager page change listener*/
         vpSplashPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -98,17 +93,21 @@ public class SplashActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
 
+                        /*animate the text*/
                         setTvSplashTextDesapiarAnimator();
                         break;
 
                     case 1:
 
 
+                        /*animate the text*/
                         setTvSplashTextDesapiarAnimator();
                         break;
 
                     case 2:
 
+
+                        /*animate the text*/
                         setTvSplashTextDesapiarAnimator();
                         break;
 
@@ -123,18 +122,21 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
+        /*if user press the skip button take him to the next activity*/
         tvSplashSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /*if user is previously logged in take him to the MainActivity*/
                 Storage storage = new Storage(SplashActivity.this);
-                if(storage.getLogInState()){
+                if (storage.getLogInState()) {
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     startActivity(intent);
                     SplashActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
                     finish();
-                }else{
+                } else {
+                    /*if user is previously not logged in take him to the AuthActivity*/
                     Intent intent = new Intent(SplashActivity.this, AuthActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     SplashActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
                     finish();
@@ -147,6 +149,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
 
+    /*type casting of views*/
     private void initViews() {
         vpSplashPager = findViewById(R.id.vp_splash);
         pageIndicatorView = findViewById(R.id.pageIndicatorView);
@@ -156,6 +159,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
 
+    /*do the animation of text of splash screens*/
     private void setTvSplashTextDesapiarAnimator() {
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
         valueAnimator.setDuration(2500);

@@ -22,6 +22,7 @@
 
             <ImageButton
                 android:layout_width="35dp"
+                android:id="@+id/btn_back_edit"
                 android:layout_height="35dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
@@ -95,7 +96,7 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:id="@+id/img_edit_profile"
-                        android:src="@drawable/img_profile" />
+                        android:src="@drawable/avater" />
 
 
                 </LinearLayout>
@@ -267,9 +268,7 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content">
-
 
             <EditText
                 android:layout_width="match_parent"
@@ -306,7 +305,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp">
 
-
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -320,6 +318,8 @@
         </android.support.design.widget.TextInputLayout>
 
 
+
+        <!--save button-->
         <Button
             android:id="@+id/btn_save"
             android:layout_width="wrap_content"

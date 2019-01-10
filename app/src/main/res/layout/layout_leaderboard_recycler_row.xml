@@ -16,7 +16,7 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="40dp"
-            android:src="@drawable/img_person"
+            android:src="@drawable/avater"
             android:layout_centerVertical="true"
             android:layout_marginStart="8dp"
             android:id="@+id/img_leaderboard_person"

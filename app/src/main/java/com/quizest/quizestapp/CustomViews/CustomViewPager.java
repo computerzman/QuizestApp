@@ -8,13 +8,16 @@ import android.view.MotionEvent;
 
 public class CustomViewPager extends ViewPager {
 
+    /*global field instances*/
     private boolean enabled;
 
+    /*constructor for the view pager*/
     public CustomViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.enabled = true;
     }
 
+//    handle the touch of the view pager
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (this.enabled) {

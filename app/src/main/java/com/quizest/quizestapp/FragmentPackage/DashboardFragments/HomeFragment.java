@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -46,6 +47,7 @@ import retrofit2.Response;
  */
 public class HomeFragment extends Fragment {
 
+    /*all global field instances are here*/
     TextView tvUserName;
     Activity activity;
     List<CategoryModel> categoryModels;
@@ -57,8 +59,9 @@ public class HomeFragment extends Fragment {
     }
 
 
+    /*this is a fragment lifecycle method */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
@@ -78,21 +81,68 @@ public class HomeFragment extends Fragment {
         }
 
         Storage storage = new Storage(activity);
-        tvUserName.setText(String.format("Hello %s, \nWelcome back ", Util.getFormattedDate(storage.getUserName())));
+        if(storage.getUserName() != null){
+            tvUserName.setText(String.format("Hello %s, \nWelcome back ", Util.getFormattedDate(storage.getUserName())));
+
+        }else{
+            tvUserName.setText(String.format("Hello %s, \nWelcome back ", "John"));
+        }
+
 
         /*adding options to category recycler*/
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         categoryRecycler.setHasFixedSize(true);
         categoryRecycler.setLayoutManager(gridLayoutManager);
         /*do api call here and set data to the recycler view */
-        getCategories();
+
+        /*if there is internet call get data from server, otherwise load for local response*/
+        if(Util.isInternetAvaiable(activity)){
+            getCategories();
+        }else{
+            Storage storage1 = new Storage(activity);
+            if(storage1.getCategoryResponse() != null){
+                /*load data from offline*/
+                /*serialize the String response  */
+                Gson gson = new Gson();
+                CategoryList categoryList = gson.fromJson(storage1.getCategoryResponse(), CategoryList.class);
+                /*add the data to the recycler view*/
+                if(categoryList.getCategoryList() != null)
+                categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity);
+                categoryRecycler.setAdapter(categoryRecyclerAdapter);
+            }
+
+
+        }
+
 
     }
 
+    @Override
+    public void onResume() {
+        /*if there is internet call get data from server, otherwise load for local response*/
+        if(Util.isInternetAvaiable(activity)){
+            getCategories();
+        }else{
+            Storage storage1 = new Storage(activity);
+            if(storage1.getCategoryResponse() != null){
+                /*load data from offline*/
+                /*serialize the String response  */
+                Gson gson = new Gson();
+                CategoryList categoryList = gson.fromJson(storage1.getCategoryResponse(), CategoryList.class);
+                /*add the data to the recycler view*/
+                if(categoryList.getCategoryList() != null)
+                    categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity);
+                categoryRecycler.setAdapter(categoryRecyclerAdapter);
+            }
+
+
+        }
+        super.onResume();
+    }
 
     private void getCategories() {
         final ProgressDialog dialog = Util.showDialog(activity);
-        Storage storage = new Storage(activity);
+        final Storage storage = new Storage(activity);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
         Call<String> categoryCall = retrofitInterface.getCategoryList(storage.getAccessToken(), Util.REQUEST_TYPE);
         categoryCall.enqueue(new Callback<String>() {
@@ -104,9 +154,12 @@ public class HomeFragment extends Fragment {
                     if (response.isSuccessful()) {
                         /*success true*/
                         try {
+
                             JSONObject jsonObject = new JSONObject(response.body());
                             boolean isSuccess = jsonObject.getBoolean("success");
                             if (isSuccess) {
+                                /*save the category response for offline uses*/
+                                storage.saveCategoryResponse(response.body());
                                 /*serialize the String response  */
                                 Gson gson = new Gson();
                                 CategoryList categoryList = gson.fromJson(response.body(), CategoryList.class);

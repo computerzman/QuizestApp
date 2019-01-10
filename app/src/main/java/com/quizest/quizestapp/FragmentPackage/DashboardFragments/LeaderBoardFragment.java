@@ -58,6 +58,26 @@ public class LeaderBoardFragment extends Fragment {
 
 
     @Override
+    public void onResume() {
+        /*if there is internet connection then we will call the server for data else we will use offline caches*/
+        if (Util.isInternetAvaiable(activity)) {
+            getLeaderBoardData();
+        } else {
+            Storage storage = new Storage(activity);
+            /*serialize the String response  */
+            if (storage.getLeaderBoardResponse() != null) {
+                Gson gson = new Gson();
+                LeaderBoard leaderBoard = gson.fromJson(storage.getLeaderBoardResponse(), LeaderBoard.class);
+                if(leaderBoard.getLeaderList() != null)
+                leaderboardRecyclerAdapter = new LeaderboardRecyclerAdapter(leaderBoard.getLeaderList(), activity);
+                leadboardRecyclerView.setAdapter(leaderboardRecyclerAdapter);
+            }
+
+        }
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -107,8 +127,22 @@ public class LeaderBoardFragment extends Fragment {
         leadboardRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
+        /*if there is internet connection then we will call the server for data else we will use offline caches*/
+        if (Util.isInternetAvaiable(activity)) {
+            getLeaderBoardData();
+        } else {
+            Storage storage = new Storage(activity);
+            /*serialize the String response  */
+            if (storage.getLeaderBoardResponse() != null) {
+                Gson gson = new Gson();
+                LeaderBoard leaderBoard = gson.fromJson(storage.getLeaderBoardResponse(), LeaderBoard.class);
+                if(leaderBoard.getLeaderList() != null)
+                leaderboardRecyclerAdapter = new LeaderboardRecyclerAdapter(leaderBoard.getLeaderList(), activity);
+                leadboardRecyclerView.setAdapter(leaderboardRecyclerAdapter);
+            }
 
-        getLeaderBoardData();
+        }
+
 
     }
 
@@ -124,7 +158,7 @@ public class LeaderBoardFragment extends Fragment {
 
     private void getLeaderBoardData() {
         final ProgressDialog dialog = Util.showDialog(activity);
-        Storage storage = new Storage(activity);
+        final Storage storage = new Storage(activity);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
         Call<String> leaderCall = retrofitInterface.getLeaderboardList(storage.getAccessToken());
         leaderCall.enqueue(new Callback<String>() {
@@ -138,6 +172,9 @@ public class LeaderBoardFragment extends Fragment {
                         JSONObject jsonObject = new JSONObject(response.body());
                         boolean isSuccess = jsonObject.getBoolean("success");
                         if (isSuccess) {
+                            /*save leaderboard reponse to local storage*/
+                            storage.saveLeaderBoardResponse(response.body());
+
                             /*serialize the String response  */
                             Gson gson = new Gson();
                             LeaderBoard leaderBoard = gson.fromJson(response.body(), LeaderBoard.class);

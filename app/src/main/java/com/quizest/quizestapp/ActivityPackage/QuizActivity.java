@@ -45,6 +45,7 @@ import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
+    /*all global field instances are here*/
     ImageButton btn_back, btnSetting;
     Fragment currentFragment;
     public QuestionList questionList;
@@ -60,13 +61,17 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*add the layout to the activity*/
         setContentView(R.layout.activity_quiz);
 
 
 
+        /*type casting the views*/
         btn_back = findViewById(R.id.btn_back);
         btnSetting = findViewById(R.id.btn_setting);
 
+        /*if user clicks on the back button take user to MainActivity*/
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,7 +83,7 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
-
+/*if user clicks on the setting button take the user to the Setting activity*/
         btnSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,14 +94,17 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
+        /*track the total point of a user globally*/
         Util.TOTAL_POINT = 0;
 
+        /*intilize the lists*/
         quizList = new ArrayList<>();
 
         isPlayed = new HashMap<>();
 
         isPlayed.clear();
 
+        /*get the question id from intent and pass it to the getQuestionList function to do the api call for question list */
 
         String QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
         if (QUESTION_ID != null) {
@@ -107,6 +115,8 @@ public class QuizActivity extends AppCompatActivity {
     }
 
 
+
+    /*this is called when user press back button*/
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, MainActivity.class);
@@ -114,6 +124,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
 
+    /*this is the api call to get data from the server we passes question id to get the question list */
     private void getQuestionList(String QUESTION_ID) {
         Storage storage = new Storage(this);
         final ProgressDialog dialog = Util.showDialog(this);
@@ -183,6 +194,8 @@ public class QuizActivity extends AppCompatActivity {
         });
     }
 
+
+    /*replace the current fragment with new fragment*/
     public void fragmentTransition(Fragment fragment) {
         this.currentFragment = fragment;
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();

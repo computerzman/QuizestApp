@@ -5,16 +5,12 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.icu.util.UniversalTimeScale;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.solver.widgets.Helper;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -28,15 +24,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.ActivityPackage.QuizActivity;
 import com.quizest.quizestapp.AdapterPackage.QuizOptionsRecyclerRow;
-import com.quizest.quizestapp.DialogPackage.Congratsdialog;
 import com.quizest.quizestapp.ModelPackage.QuestionList;
 import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -45,6 +41,8 @@ import java.util.Objects;
  */
 public class QuizFragment extends Fragment {
 
+    /*all global field instances */
+    AdView adView;
     int count = 0;
     Button btnSkip, btn_next;
     ImageView ivAnswerA;
@@ -61,6 +59,7 @@ public class QuizFragment extends Fragment {
     public QuizFragment() {
         // Required empty public constructor
     }
+
 
     public static QuizFragment newInsatance(QuestionList.AvailableQuestionListItem item) {
         Bundle bundleGot = new Bundle();
@@ -81,13 +80,21 @@ public class QuizFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+        /*inflate the fragment layout*/
         view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
         initViews();
 
+        /*show the admob ads*/
+        adView = view.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+
         tv_user_point.setText(String.valueOf(Util.QuizPoint));
 
         if (getActivity() != null && isAdded()) {
+            /*make the counter value to default*/
             iv_stopwatch.setImageResource(R.drawable.ic_stopwatch);
             tvQuizPosition.setText(String.format("%d", ((QuizActivity) getActivity()).x));
             tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
@@ -96,15 +103,18 @@ public class QuizFragment extends Fragment {
         buildOptionRecycler();
 
         if (getArguments() != null) {
+            /**/
             questionItem = (QuestionList.AvailableQuestionListItem) getArguments().getSerializable(Util.QUESTION);
             if (questionItem != null) {
 
+                /*start the count by getting the toatl time*/
                 TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     tvQuizCount.setText(String.format("/%d", ((QuizActivity) Objects.requireNonNull(getActivity())).questionList.getAvailableQuestionList().size()));
                 }
 
+                /*make the option recycler view*/
                 tv_question_name.setText(questionItem.getTitle());
                 quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), catStatus, tv_user_point);
                 optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
@@ -116,6 +126,8 @@ public class QuizFragment extends Fragment {
         btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /*if user clicks the next button chcek if the quesetion is played and then take the user to the next question*/
                 try {
                     if (QuizActivity.isPlayed.get(questionItem.getQuestionId())) {
 
@@ -137,7 +149,7 @@ public class QuizFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-
+                /*take the user to the next question if all question are finished then show the result dialog*/
                 if (getActivity() != null && isAdded()) {
                     if (((QuizActivity) getActivity()).questionList != null) {
                         Log.e("size", String.valueOf(((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()));
@@ -152,6 +164,8 @@ public class QuizFragment extends Fragment {
                             ((QuizActivity) getActivity()).fragmentTransition(quizFragment);
 
                         } else {
+
+                            /*take the user to the result dialog*/
                             Dialog dialog = new Dialog(getActivity(), android.R.style.Theme_Light_NoTitleBar_Fullscreen);
                             dialog.setContentView(R.layout.layout_congrats_dialog);
                             TextView tv_result = dialog.findViewById(R.id.tv_result);
@@ -197,6 +211,7 @@ public class QuizFragment extends Fragment {
     }
 
 
+    /*start the cound down timer*/
     private void TimeCount(long milliseconds) {
         if (getActivity() != null)
             QuizActivity.countDownTimer = new CountDownTimer(milliseconds, 1000) {
@@ -225,6 +240,7 @@ public class QuizFragment extends Fragment {
     }
 
 
+//    set data to the timer
     @SuppressLint("DefaultLocale")
     private void setQuizTime(HashMap<String, Integer> timeFromMillisecond) {
         if (getActivity() != null && isAdded()) {
@@ -233,12 +249,15 @@ public class QuizFragment extends Fragment {
 
     }
 
+
+    /*make the */
     private void buildOptionRecycler() {
         optionRecyclerView.setHasFixedSize(true);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         optionRecyclerView.setLayoutManager(gridLayoutManager);
     }
 
+    /*type casting the views*/
     private void initViews() {
         if (view != null) {
             btn_next = view.findViewById(R.id.btn_next);
@@ -255,6 +274,7 @@ public class QuizFragment extends Fragment {
     }
 
 
+//  do the animation
     private void doBlinkAnimation(TextView textView) {
         Animation anim = new AlphaAnimation(0.0f, 1.0f);
         anim.setDuration(50); //You can manage the blinking time with this parameter
@@ -265,11 +285,13 @@ public class QuizFragment extends Fragment {
     }
 
 
+    /*remove the animation */
     private void removeBlinkAnimation(TextView textView) {
         textView.clearAnimation();
     }
 
 
+    /*destroyh the view */
     @Override
     public void onDestroyView() {
         if (getActivity() != null)

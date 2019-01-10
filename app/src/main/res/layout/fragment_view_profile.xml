@@ -84,7 +84,7 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:id="@+id/img_profile"
-                        android:src="@drawable/img_profile" />
+                        android:src="@drawable/avater" />
 
 
                 </LinearLayout>
@@ -97,7 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Jony Daiking"
+                android:text=""
                 android:textColor="@color/color_white"
                 android:id="@+id/tv_profile_username"
                 android:textSize="18sp" />
@@ -109,7 +109,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
                 android:id="@+id/tv_user_email"
-                android:text="jonydaikin45@gmail.com"
+                android:text=""
                 android:textColor="@color/color_white"
                 android:textSize="14sp" />
 
@@ -138,7 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_user_points"
-                android:text="25"
+                android:text=""
                 android:textColor="@color/color_blue"
                 android:textSize="18sp" />
 
@@ -185,7 +185,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_user_ranking"
-                android:text="25K"
+                android:text=""
                 android:textColor="@color/color_blue"
                 android:textSize="18sp" />
 

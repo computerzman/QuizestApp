@@ -2,14 +2,12 @@ package com.quizest.quizestapp.FragmentPackage.AuthFragments;
 
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +44,8 @@ import retrofit2.Response;
  *
  */
 public class RegisterFragment extends Fragment {
+
+    /*global field instances*/
     Activity activity;
     TextView tv_RegisterSignIn;
     Button btn_reg_signup;
@@ -70,11 +70,14 @@ public class RegisterFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+//        view type casting
         initViews();
 
         if (getActivity() != null && isAdded()) {
             activity = getActivity();
         }
+
+//        sign in button calls
 
         tv_RegisterSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +90,7 @@ public class RegisterFragment extends Fragment {
 
 
 
+//        sign up button call
         btn_reg_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,6 +98,7 @@ public class RegisterFragment extends Fragment {
                     boolean isValid = Validator.validateInputField(new EditText[]{edtUserName, edtEmail, edtPhone, edtPassword, edtConfirmPassword}, activity);
                     if (isValid) {
                         if(edtConfirmPassword.getText().toString().equals(edtPassword.getText().toString())){
+                            /*if everyting is ok then call the do registration */
                             doRegistration(edtUserName.getText().toString(), edtEmail.getText().toString().trim(), edtPhone.getText().toString()
                                     , edtPassword.getText().toString(), edtConfirmPassword.getText().toString()
                             );
@@ -110,6 +115,7 @@ public class RegisterFragment extends Fragment {
 
     }
 
+    /*type casting of views*/
     private void initViews() {
         View view = getView();
         if (view != null) {
@@ -128,15 +134,17 @@ public class RegisterFragment extends Fragment {
         }
     }
 
+    /*send the firebase token to the server*/
     private void addUserToFireBase(){
         Storage storage = new Storage(activity);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
-       Call<String> tokenCall =  retrofitInterface.addUserToFirebase(storage.getAccessToken(), storage.getUserId(), storage.getFirebaseToken());
+       Call<String> tokenCall =  retrofitInterface.addUserToFreebase(RetrofitClient.FIREBASE_ENDPOINT + "/" + storage.getUserId() + "/" + storage.getFirebaseToken(), storage.getAccessToken());
        tokenCall.enqueue(new Callback<String>() {
            @Override
            public void onResponse(Call<String> call, Response<String> response) {
                if(response.isSuccessful()){
 
+                   Toast.makeText(activity, "Firebase success!", Toast.LENGTH_SHORT).show();
 
                }else {
                    Toast.makeText(activity, "Failed to add you in Firebase!", Toast.LENGTH_SHORT).show();
@@ -156,6 +164,7 @@ public class RegisterFragment extends Fragment {
     }
 
 
+    /*registration call */
     private void doRegistration(String name, String email, String phone, String password, String confirmPassword) {
         final ProgressDialog dialog = Util.showDialog(activity);
         final Storage storage = new Storage(activity);
@@ -185,6 +194,9 @@ public class RegisterFragment extends Fragment {
                             Util.dissmisDialog(dialog);
                             /*show success message to user*/
                             Toast.makeText(activity, "Registration success!", Toast.LENGTH_SHORT).show();
+
+                            addUserToFireBase();
+
                             /*take the user to the dashboard activity*/
                             Intent intent = new Intent(activity, MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -210,6 +222,7 @@ public class RegisterFragment extends Fragment {
                 }
             }
 
+            /*handle error when you have any error*/
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 /*dismiss the dialog*/

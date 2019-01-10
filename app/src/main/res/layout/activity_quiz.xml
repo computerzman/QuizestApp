@@ -7,6 +7,7 @@
     android:orientation="vertical"
     tools:context=".ActivityPackage.QuizActivity">
 
+    <!--top section of quiz activity-->
     <LinearLayout
         android:id="@+id/top_panel"
         android:layout_width="match_parent"
@@ -51,9 +52,7 @@
     </LinearLayout>
 
 
-
-
-
+    <!--frame layout for fragment transition-->
         <FrameLayout
             android:id="@+id/vp_quiz"
             android:layout_width="match_parent"

@@ -45,13 +45,11 @@ public class FirebaseMessangingService extends FirebaseMessagingService {
             String json = gson.toJson(remoteMessage.getData());
             JSONObject jsonObject = new JSONObject(json);
             int id = jsonObject.getInt("id");
-            String title = jsonObject.getString("title");
-            String message = jsonObject.getString("message");
+            String title = jsonObject.getString("name");
+
 
             if (storage.getLogInState()) {
                 Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra("newsID", id);
-
                 // Create the TaskStackBuilder and add the intent, which inflates the back stack
                 TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
                 stackBuilder.addNextIntentWithParentStack(intent);
@@ -79,8 +77,8 @@ public class FirebaseMessangingService extends FirebaseMessagingService {
                 notificationBuilder = new NotificationCompat.Builder(this, "C")
                         .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_name))
                         .setSmallIcon(R.drawable.ic_stat_name)
-                        .setContentTitle(title)
-                        .setContentText(message)
+                        .setContentTitle("New Quiz Category Available!")
+                        .setContentText(title)
                         .setCategory(Notification.CATEGORY_MESSAGE)
                         .setAutoCancel(true)
                         .setPriority(Notification.PRIORITY_MAX)
@@ -95,7 +93,7 @@ public class FirebaseMessangingService extends FirebaseMessagingService {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     String channelId = getString(R.string.default_notification_channel_id);
                     NotificationChannel channel = new NotificationChannel(channelId, title, NotificationManager.IMPORTANCE_HIGH);
-                    channel.setDescription(message);
+                    channel.setDescription(title);
                     notificationManager.createNotificationChannel(channel);
                     notificationBuilder.setChannelId(channelId);
                 }

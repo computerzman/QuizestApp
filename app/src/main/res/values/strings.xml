@@ -17,5 +17,13 @@
     <string name="password_not_match">Password And Confirm Password doesn\'t match!</string>
     <string name="no_internet">No Internet, Try again Later!</string>
     <string name="no_data_found">Data Not Found!</string>
+    <!--Admob app id, replace with your own app id-->
+
+    <string name="admob_id">ca-app-pub-3940256099942544~3347511713</string>
+
+
+
+    <!--Admob banner ad id, replace with your own ad unit id-->
+    <string name="admob_banner_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>

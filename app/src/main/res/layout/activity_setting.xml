@@ -10,6 +10,7 @@
     tools:context=".ActivityPackage.SettingActivity">
 
 
+    <!--change language secion-->
     <LinearLayout
         android:layout_width="match_parent"
         android:clickable="true"
@@ -50,6 +51,7 @@
 
     </LinearLayout>
 
+    <!--sound secion-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -87,6 +89,7 @@
 
     </LinearLayout>
 
+    <!--connect facebook secion-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"

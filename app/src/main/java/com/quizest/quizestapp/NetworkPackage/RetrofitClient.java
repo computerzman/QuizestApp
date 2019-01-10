@@ -7,13 +7,19 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+
+/*this is the retrofit client, we used retrofit as our networking library*/
 public class RetrofitClient {
 
+    /*those are constants urls we used in this project*/
     private static final String BASE_URL = "http://quiz.itech-softsolutions.com/api/";
     public static final String CATEGORY_URL = BASE_URL + "category/";
     public static final String SUBMIT_ANSWER_ULR = BASE_URL + "submit-answer/";
+    public static final String FIREBASE_ENDPOINT = BASE_URL + "set-user-device-id";
 
     private static Retrofit retrofit = null;
+
+    /*here we made a global */
     public static Retrofit getRetrofit() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);

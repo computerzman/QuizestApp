@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".FragmentPackage.DashboardFragments.QuizFragment">
 
 
@@ -87,7 +87,7 @@
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
         android:layout_marginStart="5dp"
         android:layout_marginBottom="8dp"
@@ -394,7 +394,7 @@
                         android:layout_height="45dp"
                         android:layout_marginEnd="4dp"
                         android:layout_weight="1"
-                        android:background="@drawable/quiz_button_bg"
+                        android:background="@drawable/quiz_skip_gradient"
                         android:foreground="?selectableItemBackground"
                         android:text="Skip"
                         android:textColor="@color/color_white" />
@@ -412,12 +412,21 @@
 
                 </LinearLayout>
 
+                <com.google.android.gms.ads.AdView
+                    xmlns:ads="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/adView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    ads:adSize="BANNER"
+                    android:layout_gravity="center_horizontal"
+                    ads:adUnitId="@string/admob_banner_id">
+                </com.google.android.gms.ads.AdView>
 
             </LinearLayout>
 
         </ScrollView>
-
-
 
     </android.support.v7.widget.CardView>
 

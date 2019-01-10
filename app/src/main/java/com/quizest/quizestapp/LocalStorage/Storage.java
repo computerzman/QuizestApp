@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 public class Storage {
 
+//    all global field constants for the local stoarage
     private static final boolean isSoundEnabled = true;
     private static final boolean LOGIN_SATE = false;
     private static final int USERID = 1;
@@ -12,6 +13,8 @@ public class Storage {
     private static final String USERNAME = null;
     private static final String FIREBASE_TOKEN = null ;
     private static final String ACCESS_TYPE = "Bearer";
+    private static final String CATEGORY_RESPONSE = null;
+    private static final String LEADERBOARD_RESPONSE = null;
     private Context context;
 
     public Storage(Context context) {
@@ -25,7 +28,7 @@ public class Storage {
 
     private SharedPreferences getsharedPreferences() {
 
-        return context.getSharedPreferences("MyData", Context.MODE_PRIVATE);
+        return context.getSharedPreferences("QuizApp", Context.MODE_PRIVATE);
     }
 
 
@@ -96,5 +99,24 @@ public class Storage {
     public int getUserId(){
         return getsharedPreferences().getInt("id", USERID);
     }
+
+    public void saveCategoryResponse(String response){
+        getPreferencesEditor().putString("category_response", response).commit();
+    }
+
+    public String getCategoryResponse(){
+       return getsharedPreferences().getString("category_response", CATEGORY_RESPONSE);
+
+    }
+
+    public void saveLeaderBoardResponse(String response){
+        getPreferencesEditor().putString("category_response", response).commit();
+    }
+
+    public String getLeaderBoardResponse(){
+        return getsharedPreferences().getString("category_response", LEADERBOARD_RESPONSE);
+
+    }
+
 
 }

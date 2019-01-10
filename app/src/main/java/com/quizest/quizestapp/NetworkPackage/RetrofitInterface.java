@@ -18,6 +18,9 @@ import retrofit2.http.Url;
 
 public interface RetrofitInterface {
 
+
+    /*those are the interface for networks calls of this project*/
+
     @FormUrlEncoded
     @POST("registration")
     Call<String> doRegistration(@Field("name") String name, @Field("phone") String phone, @Field("email") String email, @Field("password") String password, @Field("password_confirmation") String confirmPassword);
@@ -62,6 +65,6 @@ public interface RetrofitInterface {
             , @Part("name") RequestBody name, @Part("country") RequestBody country, @Part("phone") RequestBody phone, @Part MultipartBody.Part image
     );
 
-    @GET("set-user-device-id")
-    Call<String> addUserToFirebase(@Header("Authorization")String token, @Query("user_id")int userId, @Query("device_id") String id);
+    @GET
+    Call<String> addUserToFreebase(@Url String url, @Header("Authorization")String token);
 }
