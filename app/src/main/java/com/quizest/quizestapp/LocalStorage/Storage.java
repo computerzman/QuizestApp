@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 public class Storage {
 
+    private static final boolean isSoundEnabled = true;
     private static final boolean LOGIN_SATE = false;
     private static final String ACCESS_TOKEN = null;
     private static final String ACCESS_TYPE = "Bearer";
@@ -56,6 +57,14 @@ public class Storage {
     public String getAccessType() {
 
         return getsharedPreferences().getString("type", ACCESS_TYPE);
+    }
+
+    public void saveSoundState(boolean p) {
+        getPreferencesEditor().putBoolean("sound", p).commit();
+    }
+
+    public boolean getSoundState() {
+        return getsharedPreferences().getBoolean("sound", isSoundEnabled);
     }
 
 }

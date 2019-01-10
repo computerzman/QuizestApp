@@ -12,7 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
+import com.quizest.quizestapp.ActivityPackage.QuizActivity;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.QuestionList;
 import com.quizest.quizestapp.ModelPackage.SubmitAnswer;
@@ -23,6 +25,7 @@ import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -100,8 +103,8 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
     }
 
 
-    public void submitAnswer(String optionID, int position, final QuizOptionsHolder holder) {
-        Storage storage = new Storage(activity);
+    public void submitAnswer(final String optionID, int position, final QuizOptionsHolder holder) {
+        final Storage storage = new Storage(activity);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
         final Call<String> submitAnserCall = retrofitInterface.submitAnswer(RetrofitClient.SUBMIT_ANSWER_ULR + optionID, storage.getAccessToken(), optionsItemList.get(position).getId());
         submitAnserCall.enqueue(new Callback<String>() {
@@ -115,11 +118,16 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                         JSONObject jsonObject = new JSONObject(response.body());
                         boolean isSuccess = jsonObject.getBoolean("success");
                         if (!isSuccess) {
-                            if(optionsItemList.size() != 1){
+
+                            QuizActivity.isPlayed.put(optionID, true);
+
+                            try {
+                                if (storage.getSoundState()) {
+                                    Util.playWrongMusic(activity);
+                                    Util.vibratePhone(900, activity);
+                                    /*serialize the String response  */
+                                }
                                 imageView.setImageResource(R.drawable.ic_cat_worng);
-                                Util.playWrongMusic(activity);
-                                Util.vibratePhone(900, activity);
-                                /*serialize the String response  */
                                 holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
                                 holder.quizOptionBg.setImageResource(R.drawable.quiz_option_wrong);
                                 Gson gson = new Gson();
@@ -127,21 +135,49 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                                 isAnswered = true;
                                 Rightid = submitAnswer.getRightAnswer().getOptionId();
                                 notifyDataSetChanged();
-                            }else{
+
+                            } catch (IllegalStateException e) {
+
+                                QuizActivity.isPlayed.put(optionID, true);
+
                                 imageView.setImageResource(R.drawable.ic_cat_worng);
-                                Util.playWrongMusic(activity);
-                                Util.vibratePhone(900, activity);
+                                if(storage.getSoundState()){
+                                    Util.playWrongMusic(activity);
+                                    Util.vibratePhone(900, activity);
+                                }
+                                /*serialize the String response  */
                                 holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
                                 holder.quizOptionBg.setImageResource(R.drawable.quiz_option_wrong);
+                                // JSONArray Json = jsonObject.getJSONArray("right_answer");
+                                isAnswered = true;
+                            } catch (JsonSyntaxException e) {
+                                QuizActivity.isPlayed.put(optionID, true);
+
+                                imageView.setImageResource(R.drawable.ic_cat_worng);
+                                if(storage.getSoundState()){
+                                    Util.playWrongMusic(activity);
+                                    Util.vibratePhone(900, activity);
+                                }
+
+                                /*serialize the String response  */
+                                holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
+                                holder.quizOptionBg.setImageResource(R.drawable.quiz_option_wrong);
+                                isAnswered = true;
                             }
 
+
                         } else {
+
+                            QuizActivity.isPlayed.put(optionID, true);
+
                             String score = jsonObject.getString("score");
                             Util.QuizPoint = Integer.parseInt(score);
                             textView.setText(score);
                             imageView.setImageResource(R.drawable.ic_cat);
                             Util.TOTAL_POINT = Util.TOTAL_POINT + point;
-                            Util.playRightMusing(activity);
+                            if(storage.getSoundState()){
+                                Util.playRightMusing(activity);
+                            }
                             isAnswered = true;
                             holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
                             holder.quizOptionBg.setImageResource(R.drawable.quiz_option_bg_right);

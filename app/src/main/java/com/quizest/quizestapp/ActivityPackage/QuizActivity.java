@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -44,10 +45,11 @@ import retrofit2.Response;
 public class QuizActivity extends AppCompatActivity {
 
     Fragment currentFragment;
-   public QuestionList questionList;
+    public QuestionList questionList;
 
+    public static HashMap<String, Boolean> isPlayed;
     List<Fragment> quizList;
-    public int x  =
+    public int x =
             1;
     public int c = 1;
     public static CountDownTimer countDownTimer;
@@ -63,7 +65,9 @@ public class QuizActivity extends AppCompatActivity {
 
         quizList = new ArrayList<>();
 
+        isPlayed = new HashMap<>();
 
+        isPlayed.clear();
 
 
         String QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
@@ -73,7 +77,6 @@ public class QuizActivity extends AppCompatActivity {
 
 
     }
-
 
 
     @Override
@@ -106,15 +109,14 @@ public class QuizActivity extends AppCompatActivity {
                             questionList = gson.fromJson(response.body(), QuestionList.class);
 
 
-
-                            if(questionList != null){
-                                if(questionList.getAvailableQuestionList().size() != 0){
+                            if (questionList != null) {
+                                if (questionList.getAvailableQuestionList().size() != 0) {
                                     QuizFragment quizFragment = new QuizFragment();
                                     Bundle bundle = new Bundle();
                                     bundle.putSerializable(Util.QUESTION, questionList.getAvailableQuestionList().get(0));
                                     quizFragment.setArguments(bundle);
                                     fragmentTransition(quizFragment);
-                                }else{
+                                } else {
                                     Toast.makeText(QuizActivity.this, "NO Question Found!", Toast.LENGTH_SHORT).show();
                                 }
                             }

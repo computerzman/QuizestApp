@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -35,6 +37,7 @@ import retrofit2.Response;
 
 public class SettingActivity extends AppCompatActivity {
 
+    Switch sound;
     UserSetting userSetting;
     String[] langSettingInArray;
 
@@ -42,6 +45,27 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+
+        final Storage storage = new Storage(this);
+
+        sound = findViewById(R.id.sw_sound);
+
+        if (storage.getSoundState()) {
+            sound.setChecked(true);
+        } else {
+            sound.setChecked(false);
+        }
+
+        sound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    storage.saveSoundState(true);
+                } else {
+                    storage.saveSoundState(false);
+                }
+            }
+        });
 
         getUserSetting();
 

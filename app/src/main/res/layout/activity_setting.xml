@@ -78,15 +78,12 @@
             android:text="Sound"
             android:textSize="18sp" />
 
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center_vertical"
-            android:padding="5dp"
-            android:layout_marginEnd="5dp"
-            android:rotationX="180"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_show_downarrow" />
+       <Switch
+           android:id="@+id/sw_sound"
+           android:layout_width="wrap_content"
+           android:layout_gravity="center_vertical"
+           android:layout_marginEnd="5dp"
+           android:layout_height="wrap_content" />
 
     </LinearLayout>
 

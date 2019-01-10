@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        relativeLayout = findViewById(R.id.test);
+     /*   relativeLayout = findViewById(R.id.test);
         relativeLayout.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-
+*/
 
         /*type casting views */
         initviews();

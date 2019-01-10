@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Util {
 
+
     public static int TOTAL_POINT = 0;
     public static int QuizPoint = 0;
     public static final String QUIZLIST = "Quiz";
@@ -37,6 +38,7 @@ public class Util {
 
     /*this method disable shifting Animation of bottom navigation bar*/
     public static void removeShiftMode(BottomNavigationView view) {
+
 
         /*get first bottom navigation menu view from bottom navigation  */
         BottomNavigationMenuView menuView = (BottomNavigationMenuView) view.getChildAt(0);

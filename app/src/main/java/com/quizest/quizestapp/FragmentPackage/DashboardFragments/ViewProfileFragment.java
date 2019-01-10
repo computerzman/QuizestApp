@@ -218,10 +218,25 @@ public class ViewProfileFragment extends Fragment {
                             /*make the chart*/
                             for (int i = 0; i < profileSection.getDailyScore().size(); i++) {
                                 lineChatEntryData.add(new Entry(i, Math.round((float) profileSection.getDailyScore().get(i).getScorePercentage())));
-                                Log.e("MKTESTGRAPH", String.valueOf(Math.round((float) profileSection.getDailyScore().get(i).getScorePercentage())));
                                 lebels.add(Util.getFormattedDate(profileSection.getDailyScore().get(i).getDate()));
+
                             }
 
+                            lineChatEntryData.add(new Entry(2, 35));
+                            lineChatEntryData.add(new Entry(3, 55));
+                            lineChatEntryData.add(new Entry(4, 35));
+                            lineChatEntryData.add(new Entry(5, 60));
+                            lineChatEntryData.add(new Entry(6, 45));
+                            lineChatEntryData.add(new Entry(7, 70));
+
+
+
+                            lebels.add("30");
+                            lebels.add("28");
+                            lebels.add("27");
+                            lebels.add("26");
+                            lebels.add("25");
+                            lebels.add("24");
 
                             chartBuilder(lebels, lineChatEntryData);
 
