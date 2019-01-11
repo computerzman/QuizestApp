@@ -100,44 +100,37 @@ public class QuizFragment extends Fragment {
             tv_quiz_time.setText(String.format("%s:%s", "0", "00"));
         }
 
+
         buildOptionRecycler();
 
+
         if (getArguments() != null) {
-            /**/
             questionItem = (QuestionList.AvailableQuestionListItem) getArguments().getSerializable(Util.QUESTION);
             if (questionItem != null) {
-
                 /*start the count by getting the toatl time*/
                 TimeCount(Util.getMillisecondsFromMinutes(questionItem.getTimeLimit()));
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     tvQuizCount.setText(String.format("/%d", ((QuizActivity) Objects.requireNonNull(getActivity())).questionList.getAvailableQuestionList().size()));
                 }
-
                 /*make the option recycler view*/
                 tv_question_name.setText(questionItem.getTitle());
                 quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), catStatus, tv_user_point);
                 optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
-
-
             }
         }
+
 
         btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 /*if user clicks the next button chcek if the quesetion is played and then take the user to the next question*/
                 try {
                     if (QuizActivity.isPlayed.get(questionItem.getQuestionId())) {
-
                         btnSkip.performClick();
-
                     } else {
                         Toast.makeText(getActivity(), "sorry, Play first!", Toast.LENGTH_SHORT).show();
                     }
                 } catch (NullPointerException e) {
-
                     Toast.makeText(getActivity(), "sorry, Play first!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -221,8 +214,6 @@ public class QuizFragment extends Fragment {
                     if ((l / 1000) <= 10) {
                         doBlinkAnimation(tv_quiz_time);
                         iv_stopwatch.setImageResource(R.drawable.ic_frown);
-
-
                     }
                     setQuizTime(Util.getTimeFromMillisecond(l));
                 }
