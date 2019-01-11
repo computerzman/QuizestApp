@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.EarnCoinFragment;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*all global field instances are here*/
 
+    private int count = 0;
     BottomNavigationView bv_BottomBar;
     ImageButton btn_logout, btn_setting;
     Fragment currentFragment;
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 storage.SaveLogInSate(false);
                 /*take the current user to the log in page*/
                 Intent intent = new Intent(MainActivity.this, AuthActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
             }
@@ -186,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
         //*make the statusbar transparent if version is above kitkat*//*
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-/*replace the current fragment with new fragment*/
+    /*replace the current fragment with new fragment*/
     public void fragmentTransition(Fragment fragment) {
         this.currentFragment = fragment;
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -216,5 +217,22 @@ public class MainActivity extends AppCompatActivity {
         bv_BottomBar = findViewById(R.id.bv_bottom_bar);
         btn_logout = findViewById(R.id.btn_logout);
         btn_setting = findViewById(R.id.btn_setting);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!(currentFragment instanceof HomeFragment)) {
+            bv_BottomBar.setSelectedItemId(R.id.navigation_home);
+            fragmentTransition(new HomeFragment());
+
+        } else {
+            count++;
+            if (count == 1) {
+                Toast.makeText(this, "Press Again To Exit!", Toast.LENGTH_SHORT).show();
+            } else if (count == 2) {
+                super.onBackPressed();
+            }
+        }
+
     }
 }

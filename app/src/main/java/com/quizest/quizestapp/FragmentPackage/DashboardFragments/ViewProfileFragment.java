@@ -213,7 +213,7 @@ public class ViewProfileFragment extends Fragment {
                             userPoints.setText(profileSection.getData().getUser().getPoints());
                             userRanking.setText(String.valueOf(profileSection.getData().getUser().getRanking()));
                             if (getActivity() != null)
-                                GlideApp.with(getActivity()).load(profileSection.getData().getUser().getPhoto()).into(img_profile);
+                                GlideApp.with(getActivity()).load(profileSection.getData().getUser().getPhoto()).placeholder(R.drawable.avater).into(img_profile);
 
                             /*make the chart*/
                             for (int i = 0; i < profileSection.getDailyScore().size(); i++) {

@@ -16,17 +16,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.data.Entry;
 import com.google.gson.Gson;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.AdapterPackage.CategoryRecyclerAdapter;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.CategoryList;
 import com.quizest.quizestapp.ModelPackage.CategoryModel;
+import com.quizest.quizestapp.ModelPackage.ProfileSection;
 import com.quizest.quizestapp.ModelPackage.UserLogIn;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
 import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
 import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
+import com.quizest.quizestapp.UtilPackge.GlideApp;
 import com.quizest.quizestapp.UtilPackge.Util;
 
 import org.json.JSONException;
@@ -80,14 +83,8 @@ public class HomeFragment extends Fragment {
             activity = getActivity();
         }
 
-        Storage storage = new Storage(activity);
-        if(storage.getUserName() != null){
-            tvUserName.setText(String.format("Hello %s, \nWelcome back ", Util.getFormattedDate(storage.getUserName())));
 
-        }else{
-            tvUserName.setText(String.format("Hello %s, \nWelcome back ", "John"));
-        }
-
+        getProfileData();
 
         /*adding options to category recycler*/
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
@@ -117,6 +114,8 @@ public class HomeFragment extends Fragment {
 
     }
 
+
+    /**/
     @Override
     public void onResume() {
         /*if there is internet call get data from server, otherwise load for local response*/
@@ -203,12 +202,64 @@ public class HomeFragment extends Fragment {
     }
 
 
+    /*view type casting*/
     private void initViews() {
         View view = getView();
         if (view != null) {
             tvUserName = view.findViewById(R.id.tv_username);
             categoryRecycler = view.findViewById(R.id.recycler_categories);
         }
+    }
+
+
+    private void getProfileData() {
+        final Storage storage = new Storage(getActivity());
+        RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
+        final Call<String> profileCall = retrofitInterface.getProfileData(storage.getAccessToken());
+        profileCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                /*handle error globally */
+                ErrorHandler.getInstance().handleError(response.code(), getActivity(), null);
+                if (response.isSuccessful()) {
+                    /*success true*/
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        boolean isSuccess = jsonObject.getBoolean("success");
+                        if (isSuccess) {
+                            /*serialize the String response  */
+                            Gson gson = new Gson();
+                            ProfileSection profileSection = gson.fromJson(response.body(), ProfileSection.class);
+                            storage.saveUserName(profileSection.getData().getUser().getName());
+                            /*simple data binding for profile section*/
+                            tvUserName.setText(String.format("Hello %s, \nWelcome back ", Util.getFormattedDate(profileSection.getData().getUser().getName())));
+
+
+                        } else {
+                            /*get all the error messages and show to the user*/
+                            String message = jsonObject.getString("message");
+                            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    if(getActivity()!=null)
+                    Toast.makeText(getActivity(), R.string.no_data_found, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                /*handle network error and notify the user*/
+                if (t instanceof SocketTimeoutException || t instanceof IOException) {
+                    if (getActivity() != null && isAdded())
+                        Toast.makeText(getActivity(), R.string.connection_timeout, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
 
