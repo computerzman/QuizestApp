@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteCallbackList;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,10 +20,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.quizest.quizestapp.ActivityPackage.AuthActivity;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
-import com.quizest.quizestapp.ActivityPackage.SplashActivity;
 import com.quizest.quizestapp.LocalStorage.Storage;
-import com.quizest.quizestapp.ModelPackage.UserLogIn;
-import com.quizest.quizestapp.ModelPackage.UserRegistration;
+import com.quizest.quizestapp.ModelPackage.UserLogin;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
 import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
 import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
@@ -32,7 +29,6 @@ import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
 import com.quizest.quizestapp.UtilPackge.Validator;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -150,11 +146,16 @@ public class LogInFragment extends Fragment {
                         if (isSuccess) {
                             /*serialize the String response  */
                             Gson gson = new Gson();
-                            UserLogIn userLogIn = gson.fromJson(response.body(), UserLogIn.class);
+                            UserLogin userLogIn = gson.fromJson(response.body(), UserLogin.class);
                             /*save the user data to local storage*/
                             storage.SaveAccessToken(userLogIn.getData().getAccessToken());
                             storage.SaveAccessType(userLogIn.getData().getAccessType());
                             storage.SaveLogInSate(true);
+                            storage.saveUserName(userLogIn.getData().getUserInfo().getName());
+                            storage.saveUserId(userLogIn.getData().getUserInfo().getId());
+                            storage.saveUserTotalCoin(userLogIn.getData().getTotalCoin());
+                            storage.saveUserTotalPoint(Integer.parseInt(userLogIn.getData().getTotalPoint()));
+                            storage.saveUserAdmobPoint(userLogIn.getData().getAdmobCoin());
                             /*dismiss the dialog*/
                             Util.dissmisDialog(dialog);
                             /*take the user to the dashboard activity*/

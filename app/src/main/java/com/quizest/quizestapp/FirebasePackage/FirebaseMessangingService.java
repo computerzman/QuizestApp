@@ -37,8 +37,8 @@ public class FirebaseMessangingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
-        Storage storage = new Storage(this);
 
+        Storage storage = new Storage(this);
 
         try {
             Gson gson = new Gson();
@@ -72,18 +72,18 @@ public class FirebaseMessangingService extends FirebaseMessagingService {
                 }
 
 
-
-
-                notificationBuilder = new NotificationCompat.Builder(this, "C")
-                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_name))
-                        .setSmallIcon(R.drawable.ic_stat_name)
-                        .setContentTitle("New Quiz Category Available!")
-                        .setContentText(title)
-                        .setCategory(Notification.CATEGORY_MESSAGE)
-                        .setAutoCancel(true)
-                        .setPriority(Notification.PRIORITY_MAX)
-                        .setSound(defaultSoundUri)
-                        .setContentIntent(pendingIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    notificationBuilder = new NotificationCompat.Builder(this, "C")
+                            .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_name))
+                            .setSmallIcon(R.drawable.ic_stat_name)
+                            .setContentTitle("New Quiz Category Available!")
+                            .setContentText(title)
+                            .setCategory(Notification.CATEGORY_MESSAGE)
+                            .setAutoCancel(true)
+                            .setPriority(Notification.PRIORITY_MAX)
+                            .setSound(defaultSoundUri)
+                            .setContentIntent(pendingIntent);
+                }
 
 
                 NotificationManager notificationManager =

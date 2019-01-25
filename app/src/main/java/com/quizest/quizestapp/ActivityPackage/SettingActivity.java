@@ -2,7 +2,6 @@ package com.quizest.quizestapp.ActivityPackage;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
@@ -16,13 +15,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.quizest.quizestapp.LocalStorage.Storage;
-import com.quizest.quizestapp.ModelPackage.UserLogIn;
 import com.quizest.quizestapp.ModelPackage.UserSetting;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
 import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
 import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
-import com.quizest.quizestapp.UtilPackge.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;

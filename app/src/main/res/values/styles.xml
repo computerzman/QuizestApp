@@ -27,4 +27,9 @@
         <item name="android:windowEnterAnimation">@anim/fadein_dialog</item>
         <item name="android:windowExitAnimation">@anim/fadeout_dialog</item>
     </style>
+
+    <style name="alert_dialog">
+        <item name="android:windowEnterAnimation">@anim/slide_left</item>
+        <item name="android:windowExitAnimation">@anim/slide_right</item>
+    </style>
 </resources>

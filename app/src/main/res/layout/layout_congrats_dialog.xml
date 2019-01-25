@@ -39,19 +39,37 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_result"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="350"
+                    android:text="Earned Coin"
                     android:textColor="@color/color_white"
-                    android:textSize="48sp" />
+                    android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Your Score!"
+                    android:text="50"
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/tv_earned_coin"
                     android:textColor="@color/color_white"
-                    android:textSize="18sp" />
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Earned Point"
+                    android:layout_marginTop="16dp"
+                    android:textColor="@color/color_white"
+                    android:textSize="20sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="350"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/color_white"
+                    android:id="@+id/tv_earned_point"
+                    android:textSize="20sp" />
+
 
 
             </LinearLayout>

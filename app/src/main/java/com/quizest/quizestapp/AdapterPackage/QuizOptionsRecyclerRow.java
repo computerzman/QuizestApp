@@ -1,7 +1,7 @@
 package com.quizest.quizestapp.AdapterPackage;
 /*all used classes are imported here*/
+
 import android.app.Activity;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,19 +13,17 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.ActivityPackage.QuizActivity;
+import com.quizest.quizestapp.FragmentPackage.DashboardFragments.QuizFragment;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.QuestionList;
-import com.quizest.quizestapp.ModelPackage.SubmitAnswer;
-import com.quizest.quizestapp.ModelPackage.UserLogIn;
+import com.quizest.quizestapp.ModelPackage.SubminAnswer;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
 import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
 import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,18 +41,24 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
     private Activity activity;
     private String questionID;
     private int point;
+    private int coin;
     private int Rightid = 0;
-    TextView textView;
+    TextView textView, userCoin;
+    QuizFragment quizFragment;
     ImageView imageView;
     private boolean isAnswered = false;
+
     /*this is the constructor for the leaderboard */
-    public QuizOptionsRecyclerRow(List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID, int point, ImageView imageView, TextView tv_user_point) {
+    public QuizOptionsRecyclerRow(QuizFragment quizFragment, List<QuestionList.OptionsItem> optionsItemList, Activity activity, String questionID, int point, int coin, ImageView imageView, TextView tv_user_point, TextView tvUserCoin) {
         this.optionsItemList = optionsItemList;
         this.point = point;
         this.activity = activity;
         this.questionID = questionID;
         this.imageView = imageView;
         textView = tv_user_point;
+        this.coin = coin;
+        this.quizFragment = quizFragment;
+        this.userCoin = tvUserCoin;
     }
 
 
@@ -82,7 +86,10 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
             holder.quizOptionBg.setEnabled(true);
         }
         /*set the option name */
-        holder.quizOptionName.setText(Util.convertUnCapitalized(optionsItemList.get(position).getOptionTitle()));
+        if (optionsItemList.get(position).getOptionTitle() != null) {
+            holder.quizOptionName.setText(Util.convertUnCapitalized(optionsItemList.get(position).getOptionTitle()));
+        }
+
         /*click listener for the options*/
         holder.quizOptionBg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,7 +156,7 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                                 holder.quizOptionName.setTextColor(activity.getResources().getColor(R.color.color_white));
                                 holder.quizOptionBg.setImageResource(R.drawable.quiz_option_wrong);
                                 Gson gson = new Gson();
-                                SubmitAnswer submitAnswer = gson.fromJson(response.body(), SubmitAnswer.class);
+                                SubminAnswer submitAnswer = gson.fromJson(response.body(), SubminAnswer.class);
                                 isAnswered = true;
                                 Rightid = submitAnswer.getRightAnswer().getOptionId();
                                 notifyDataSetChanged();
@@ -159,7 +166,7 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                                 QuizActivity.isPlayed.put(optionID, true);
 
                                 imageView.setImageResource(R.drawable.ic_cat_worng);
-                                if(storage.getSoundState()){
+                                if (storage.getSoundState()) {
                                     Util.playWrongMusic(activity);
                                     Util.vibratePhone(900, activity);
                                 }
@@ -172,7 +179,7 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
                                 QuizActivity.isPlayed.put(optionID, true);
 
                                 imageView.setImageResource(R.drawable.ic_cat_worng);
-                                if(storage.getSoundState()){
+                                if (storage.getSoundState()) {
                                     Util.playWrongMusic(activity);
                                     Util.vibratePhone(900, activity);
                                 }
@@ -190,16 +197,25 @@ public class QuizOptionsRecyclerRow extends RecyclerView.Adapter<QuizOptionsRecy
 
                             /*make global value isPlayed to true*/
                             QuizActivity.isPlayed.put(optionID, true);
-
-                            String score = jsonObject.getString("score");
+                            String total_point = jsonObject.getString("total_point");
+                            int total_coin = jsonObject.getInt("total_coin");
                             /*set global quiz point*/
-                            Util.QuizPoint = Integer.parseInt(score);
-                            textView.setText(score);
+                            Util.QuizPoint = Integer.parseInt(total_point);
+                            textView.setText(String.valueOf(total_coin));
+                            userCoin.setText(String.valueOf(total_point));
+
                             imageView.setImageResource(R.drawable.ic_cat);
                             /*update total point*/
                             Util.TOTAL_POINT = Util.TOTAL_POINT + point;
-                            /*if sound options avaiable then play the sound*/
-                            if(storage.getSoundState()){
+
+                            Util.TOTAL_COIN = Util.TOTAL_COIN + coin;
+
+                            /*increase user total point and coin*/
+                            quizFragment.TOTAL_COIN = quizFragment.TOTAL_COIN + coin;
+                            quizFragment.TOTAL_POINT = quizFragment.TOTAL_POINT + point;
+
+                            /*if sound options available then play the sound*/
+                            if (storage.getSoundState()) {
                                 Util.playRightMusing(activity);
                             }
                             isAnswered = true;

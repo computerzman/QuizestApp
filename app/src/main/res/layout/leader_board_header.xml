@@ -14,26 +14,18 @@
         android:background="?android:attr/selectableItemBackground"
         android:layout_height="match_parent">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="40dp"
-            android:src="@drawable/avater"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
-            android:id="@+id/img_leaderboard_person"
-            android:layout_height="match_parent" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_centerVertical="true"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="16dp"
             android:textStyle="bold"
             android:layout_toEndOf="@id/img_leaderboard_person"
             android:layout_gravity="center_vertical"
             android:id="@+id/tv_leaderboard_name"
             android:textSize="18sp"
-            android:text="Charles Dekins"
-            android:textColor="@color/color_text"
+            android:textColor="@color/color_blue"
+            android:text="People"
             />
 
         <TextView
@@ -43,10 +35,10 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_centerVertical="true"
+            android:textColor="@color/color_blue"
             android:layout_toStartOf="@id/tv_leaderboard_rank"
-            android:layout_marginEnd="58dp"
-            android:id="@+id/tv_leaderboard_point"
-            android:text="3255"
+            android:layout_marginEnd="32dp"
+            android:text="Score"
             />
 
 
@@ -55,13 +47,13 @@
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="16dp"
             android:layout_alignParentEnd="true"
             android:layout_height="wrap_content"
             android:textColor="@color/color_blue"
             android:id="@+id/tv_leaderboard_rank"
             android:textSize="18sp"
-            android:text="8"
+            android:text="Rank"
             />
 
     </RelativeLayout>

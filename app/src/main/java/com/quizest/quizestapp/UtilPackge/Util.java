@@ -33,6 +33,7 @@ public class Util {
 
 
     public static int TOTAL_POINT = 0;
+    public static int TOTAL_COIN = 0;
     public static int QuizPoint = 0;
     public static final String QUIZLIST = "Quiz";
     public static final String QUESTION = "question";
@@ -146,7 +147,7 @@ public class Util {
     @SuppressLint("SimpleDateFormat")
     public static String getFormattedDate(String date) {
         String[] section = date.split(" ");
-        return section[0];
+        return section[0] + " " + section[1];
     }
 
 
@@ -248,6 +249,7 @@ public class Util {
 
     /*show the dialog*/
     public static ProgressDialog showDialog(Activity activity) {
+        assert activity != null;
         ProgressDialog dialog = new ProgressDialog(activity);
         dialog.setMessage("Loading...");
         dialog.show();
@@ -257,7 +259,7 @@ public class Util {
 
     /*dismis the dialog*/
     public static void dissmisDialog(ProgressDialog dialog) {
-        if (dialog.isShowing()) {
+        if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
     }

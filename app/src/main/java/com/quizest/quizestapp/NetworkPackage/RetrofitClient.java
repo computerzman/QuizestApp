@@ -12,8 +12,10 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class RetrofitClient {
 
     /*those are constants urls we used in this project*/
-    private static final String BASE_URL = "http://quiz.itech-softsolutions.com/api/";
+   // private static final String BASE_URL = "http://quiz.itech-softsolutions.com/api/";
+    private static final String BASE_URL = "http://quizapp.itech-softsolutions.com/api/";
     public static final String CATEGORY_URL = BASE_URL + "category/";
+    public static final String LEADERBOARD_URL = BASE_URL + "leader-board/";
     public static final String SUBMIT_ANSWER_ULR = BASE_URL + "submit-answer/";
     public static final String FIREBASE_ENDPOINT = BASE_URL + "set-user-device-id";
 

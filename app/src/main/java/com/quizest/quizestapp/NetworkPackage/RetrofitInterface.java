@@ -44,8 +44,8 @@ public interface RetrofitInterface {
     Call<String> submitAnswer(@Url String url, @Header("Authorization") String token, @Field("answer") int answer);
 
 
-    @GET("leader-board")
-    Call<String> getLeaderboardList(@Header("Authorization") String token);
+    @GET
+    Call<String> getLeaderboardList(@Url String url, @Header("Authorization") String token);
 
     @GET("profile")
     Call<String> getProfileData(@Header("Authorization") String token);
@@ -67,4 +67,12 @@ public interface RetrofitInterface {
 
     @GET
     Call<String> addUserToFreebase(@Url String url, @Header("Authorization")String token);
+
+    @FormUrlEncoded
+    @POST("deduct-coin")
+    Call<String> expandCoin(@Header("Authorization")String token, @Field("coin")int coin);
+
+    @FormUrlEncoded
+    @POST("earn-coin")
+    Call<String> earnCoin(@Header("Authorization")String token, @Field("coin")int coin);
 }

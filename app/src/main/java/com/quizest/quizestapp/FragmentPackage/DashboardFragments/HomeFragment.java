@@ -3,7 +3,6 @@ package com.quizest.quizestapp.FragmentPackage.DashboardFragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,20 +15,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.data.Entry;
 import com.google.gson.Gson;
-import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.AdapterPackage.CategoryRecyclerAdapter;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.CategoryList;
 import com.quizest.quizestapp.ModelPackage.CategoryModel;
-import com.quizest.quizestapp.ModelPackage.ProfileSection;
-import com.quizest.quizestapp.ModelPackage.UserLogIn;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
 import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
 import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
-import com.quizest.quizestapp.UtilPackge.GlideApp;
 import com.quizest.quizestapp.UtilPackge.Util;
 
 import org.json.JSONException;
@@ -37,7 +31,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -84,7 +77,11 @@ public class HomeFragment extends Fragment {
         }
 
 
-        getProfileData();
+        Storage storage = new Storage(activity);
+        /*simple data binding for profile section*/
+        if (storage.getUserName() != null)
+            tvUserName.setText(String.format("Hello %s, \nWelcome back ", storage.getUserName()));
+
 
         /*adding options to category recycler*/
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
@@ -93,18 +90,18 @@ public class HomeFragment extends Fragment {
         /*do api call here and set data to the recycler view */
 
         /*if there is internet call get data from server, otherwise load for local response*/
-        if(Util.isInternetAvaiable(activity)){
+        if (Util.isInternetAvaiable(activity)) {
             getCategories();
-        }else{
+        } else {
             Storage storage1 = new Storage(activity);
-            if(storage1.getCategoryResponse() != null){
+            if (storage1.getCategoryResponse() != null) {
                 /*load data from offline*/
                 /*serialize the String response  */
                 Gson gson = new Gson();
                 CategoryList categoryList = gson.fromJson(storage1.getCategoryResponse(), CategoryList.class);
                 /*add the data to the recycler view*/
-                if(categoryList.getCategoryList() != null)
-                categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity);
+                if (categoryList.getCategoryList() != null)
+                    categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity, categoryList.getUserAvailableCoin());
                 categoryRecycler.setAdapter(categoryRecyclerAdapter);
             }
 
@@ -119,18 +116,18 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         /*if there is internet call get data from server, otherwise load for local response*/
-        if(Util.isInternetAvaiable(activity)){
+        if (Util.isInternetAvaiable(activity)) {
             getCategories();
-        }else{
+        } else {
             Storage storage1 = new Storage(activity);
-            if(storage1.getCategoryResponse() != null){
+            if (storage1.getCategoryResponse() != null) {
                 /*load data from offline*/
                 /*serialize the String response  */
                 Gson gson = new Gson();
                 CategoryList categoryList = gson.fromJson(storage1.getCategoryResponse(), CategoryList.class);
                 /*add the data to the recycler view*/
-                if(categoryList.getCategoryList() != null)
-                    categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity);
+                if (categoryList.getCategoryList() != null)
+                    categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity, categoryList.getUserAvailableCoin());
                 categoryRecycler.setAdapter(categoryRecyclerAdapter);
             }
 
@@ -150,41 +147,40 @@ public class HomeFragment extends Fragment {
                 /*handle error globally */
                 ErrorHandler.getInstance().handleError(response.code(), activity, dialog);
 
-                    if (response.isSuccessful()) {
-                        /*success true*/
-                        try {
+                if (response.isSuccessful()) {
+                    /*success true*/
+                    try {
 
-                            JSONObject jsonObject = new JSONObject(response.body());
-                            boolean isSuccess = jsonObject.getBoolean("success");
-                            if (isSuccess) {
-                                /*save the category response for offline uses*/
-                                storage.saveCategoryResponse(response.body());
-                                /*serialize the String response  */
-                                Gson gson = new Gson();
-                                CategoryList categoryList = gson.fromJson(response.body(), CategoryList.class);
-                                /*dismiss the dialog*/
-                                Util.dissmisDialog(dialog);
-                                /*add the data to the recycler view*/
-                                categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity);
-                                categoryRecycler.setAdapter(categoryRecyclerAdapter);
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        boolean isSuccess = jsonObject.getBoolean("success");
+                        if (isSuccess) {
+                            /*save the category response for offline uses*/
+                            storage.saveCategoryResponse(response.body());
+                            /*serialize the String response  */
+                            Gson gson = new Gson();
+                            CategoryList categoryList = gson.fromJson(response.body(), CategoryList.class);
+                            /*dismiss the dialog*/
+                            Util.dissmisDialog(dialog);
+                            /*add the data to the recycler view*/
+                            categoryRecyclerAdapter = new CategoryRecyclerAdapter(categoryList.getCategoryList(), activity, categoryList.getUserAvailableCoin());
+                            categoryRecycler.setAdapter(categoryRecyclerAdapter);
 
-                            } else {
-                                /*dismiss the dialog*/
-                                Util.dissmisDialog(dialog);
-                                /*get all the error messages and show to the user*/
-                                String message = jsonObject.getString("message");
-                                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } else {
+                            /*dismiss the dialog*/
+                            Util.dissmisDialog(dialog);
+                            /*get all the error messages and show to the user*/
+                            String message = jsonObject.getString("message");
+                            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
                         }
-
-                    } else {
-                        Util.dissmisDialog(dialog);
-                        Toast.makeText(activity, R.string.no_data_found, Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }
 
+                } else {
+                    Util.dissmisDialog(dialog);
+                    Toast.makeText(activity, R.string.no_data_found, Toast.LENGTH_SHORT).show();
+                }
+            }
 
 
             @Override
@@ -212,54 +208,5 @@ public class HomeFragment extends Fragment {
     }
 
 
-    private void getProfileData() {
-        final Storage storage = new Storage(getActivity());
-        RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
-        final Call<String> profileCall = retrofitInterface.getProfileData(storage.getAccessToken());
-        profileCall.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-
-                /*handle error globally */
-                ErrorHandler.getInstance().handleError(response.code(), getActivity(), null);
-                if (response.isSuccessful()) {
-                    /*success true*/
-                    try {
-                        JSONObject jsonObject = new JSONObject(response.body());
-                        boolean isSuccess = jsonObject.getBoolean("success");
-                        if (isSuccess) {
-                            /*serialize the String response  */
-                            Gson gson = new Gson();
-                            ProfileSection profileSection = gson.fromJson(response.body(), ProfileSection.class);
-                            storage.saveUserName(profileSection.getData().getUser().getName());
-                            /*simple data binding for profile section*/
-                            tvUserName.setText(String.format("Hello %s, \nWelcome back ", Util.getFormattedDate(profileSection.getData().getUser().getName())));
-
-
-                        } else {
-                            /*get all the error messages and show to the user*/
-                            String message = jsonObject.getString("message");
-                            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    if(getActivity()!=null)
-                    Toast.makeText(getActivity(), R.string.no_data_found, Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                /*handle network error and notify the user*/
-                if (t instanceof SocketTimeoutException || t instanceof IOException) {
-                    if (getActivity() != null && isAdded())
-                        Toast.makeText(getActivity(), R.string.connection_timeout, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
 }
 

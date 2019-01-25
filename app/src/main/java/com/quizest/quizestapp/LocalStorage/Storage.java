@@ -5,16 +5,21 @@ import android.content.SharedPreferences;
 
 public class Storage {
 
-//    all global field constants for the local stoarage
+    //    all global field constants for the local stoarage
     private static final boolean isSoundEnabled = true;
     private static final boolean LOGIN_SATE = false;
     private static final int USERID = 1;
     private static final String ACCESS_TOKEN = null;
     private static final String USERNAME = null;
-    private static final String FIREBASE_TOKEN = null ;
+    private static final String FIREBASE_TOKEN = null;
     private static final String ACCESS_TYPE = "Bearer";
     private static final String CATEGORY_RESPONSE = null;
     private static final String LEADERBOARD_RESPONSE = null;
+
+    private static final int USER_COIN = 0;
+    private static final int USER_POINT = 0;
+    private static final int ADMOB_POINT = 0;
+
     private Context context;
 
     public Storage(Context context) {
@@ -60,12 +65,12 @@ public class Storage {
 
     }
 
-    public void saveUserName(String name){
+    public void saveUserName(String name) {
         getPreferencesEditor().putString("name", name).commit();
     }
 
-    public String getUserName(){
-        return getsharedPreferences().getString("name" , USERNAME);
+    public String getUserName() {
+        return getsharedPreferences().getString("name", USERNAME);
     }
 
     public String getAccessType() {
@@ -92,30 +97,58 @@ public class Storage {
 
     }
 
-    public void saveUserId(int i){
+    public void saveUserId(int i) {
         getPreferencesEditor().putInt("id", i).commit();
     }
 
-    public int getUserId(){
+    public int getUserId() {
         return getsharedPreferences().getInt("id", USERID);
     }
 
-    public void saveCategoryResponse(String response){
+    public void saveCategoryResponse(String response) {
         getPreferencesEditor().putString("category_response", response).commit();
     }
 
-    public String getCategoryResponse(){
-       return getsharedPreferences().getString("category_response", CATEGORY_RESPONSE);
+    public String getCategoryResponse() {
+        return getsharedPreferences().getString("category_response", CATEGORY_RESPONSE);
 
     }
 
-    public void saveLeaderBoardResponse(String response){
+    public void saveLeaderBoardResponse(String response) {
         getPreferencesEditor().putString("category_response", response).commit();
     }
 
-    public String getLeaderBoardResponse(){
+    public String getLeaderBoardResponse() {
         return getsharedPreferences().getString("category_response", LEADERBOARD_RESPONSE);
 
+    }
+
+    public void saveUserTotalCoin(int coin) {
+
+        getPreferencesEditor().putInt("coin", coin).commit();
+    }
+
+    public int getUserTotalCoin() {
+
+        return getsharedPreferences().getInt("coin", USER_COIN);
+    }
+
+
+    public void saveUserTotalPoint(int point) {
+        getPreferencesEditor().putInt("point", point).commit();
+    }
+
+    public int getUserTotalPoint() {
+        return getsharedPreferences().getInt("point", USER_POINT);
+    }
+
+
+    public void saveUserAdmobPoint(int admob) {
+        getPreferencesEditor().putInt("admob", admob).commit();
+    }
+
+    public int getUserAdmobPoint() {
+        return getsharedPreferences().getInt("admob", ADMOB_POINT);
     }
 
 

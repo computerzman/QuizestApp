@@ -1,9 +1,9 @@
 package com.quizest.quizestapp.FragmentPackage.DashboardFragments;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.DashPathEffect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,12 +25,12 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.gson.Gson;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.ActivityPackage.SettingActivity;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.ProfileSection;
-import com.quizest.quizestapp.ModelPackage.UserLogIn;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
 import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
 import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
@@ -44,7 +44,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,12 +54,14 @@ import retrofit2.Response;
  */
 public class ViewProfileFragment extends Fragment {
 
+
+    Activity activity;
     ImageButton btnEditProfile, button_setting_profile;
     LineChart graphQuizReport;
     ImageView img_profile;
     ArrayList<Entry> lineChatEntryData;
     TextView userName, userEmail, userPoints, userRanking;
-    ArrayList<String> lebels;
+    String[] lebels;
 
     public ViewProfileFragment() {
         // Required empty public constructor
@@ -70,6 +71,11 @@ public class ViewProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if (getActivity() != null && isAdded()) {
+            activity = getActivity();
+        }
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_view_profile, container, false);
     }
@@ -81,7 +87,7 @@ public class ViewProfileFragment extends Fragment {
 
         initViews();
 
-        lebels = new ArrayList<>();
+
         lineChatEntryData = new ArrayList<>();
 
         getProfileData();
@@ -90,45 +96,25 @@ public class ViewProfileFragment extends Fragment {
         btnEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (getActivity() != null && isAdded())
-                    ((MainActivity) getActivity()).fragmentTransition(new EditProfileFragment());
+
+                ((MainActivity) activity).fragmentTransition(new EditProfileFragment());
             }
         });
 
         button_setting_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                Intent intent = new Intent(activity, SettingActivity.class);
                 startActivity(intent);
-                if(getActivity() != null)
-                getActivity().overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
-                getActivity().finish();
+                activity.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+                activity.finish();
             }
         });
 
 
     }
 
-    private void chartBuilder(final ArrayList<String> lebels, final ArrayList<Entry> lineChatEntryData) {
-
-        /*
-         */
-        /*input data into entry *//*
-
-        lineChatEntryData.add(new Entry(1, 26f));
-        lineChatEntryData.add(new Entry(2, 14f, getResources().getDrawable(R.drawable.circle_bg_on_graph)));
-        lineChatEntryData.add(new Entry(3, 12f));
-        lineChatEntryData.add(new Entry(4, 19f));
-        lineChatEntryData.add(new Entry(5, 12f));
-        lineChatEntryData.add(new Entry(6, 21f));
-        lineChatEntryData.add(new Entry(7, 8f));
-        lineChatEntryData.add(new Entry(8, 22f));
-        lineChatEntryData.add(new Entry(9, 10f));
-        lineChatEntryData.add(new Entry(10, 7f));
-        lineChatEntryData.add(new Entry(11, 15f));
-        lineChatEntryData.add(new Entry(12, 18f));
-
-*/
+    private void chartBuilder(final String[] lebels, final ArrayList<Entry> lineChatEntryData) {
 
 
         LineDataSet dataSet = new LineDataSet(lineChatEntryData, ""); // add entries to dataset
@@ -147,26 +133,26 @@ public class ViewProfileFragment extends Fragment {
         graphQuizReport.invalidate();
 
 
-        XAxis xAxis = graphQuizReport.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                if ((int) value <= lineChatEntryData.size() - 1) {
-                    return lebels.get((int) value);
-                } else {
-                    return "1";
-                }
-
-            }
-        });
-
-        graphQuizReport.setVisibleYRangeMaximum(200, YAxis.AxisDependency.LEFT);
-        //gr//aphQuizReport.setVisibleYRange(0, 100, YAxis.AxisDependency.LEFT);
         graphQuizReport.getAxisRight().setEnabled(false);
-        //graphQuizReport.getAxisLeft().setEnabled(false);
         graphQuizReport.getAxisLeft().setDrawGridLines(false);
         graphQuizReport.getXAxis().setDrawGridLines(false);
+
+         XAxis xAxis = graphQuizReport.getXAxis();
+        xAxis.setLabelCount(lineChatEntryData.size(), true);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+
+     /*   IAxisValueFormatter formatter = new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                        return lebels[(int)value];
+            }
+        };
+*/
+
+     /*   xAxis.setValueFormatter(formatter);
+*/
+
 
 
     }
@@ -212,17 +198,21 @@ public class ViewProfileFragment extends Fragment {
                             userName.setText(profileSection.getData().getUser().getName());
                             userPoints.setText(profileSection.getData().getUser().getPoints());
                             userRanking.setText(String.valueOf(profileSection.getData().getUser().getRanking()));
-                            if (getActivity() != null)
-                                GlideApp.with(getActivity()).load(profileSection.getData().getUser().getPhoto()).placeholder(R.drawable.avater).into(img_profile);
+
+                            GlideApp.with(activity).load(profileSection.getData().getUser().getPhoto()).placeholder(R.drawable.avater).into(img_profile);
+
+                            lebels = new String[profileSection.getDailyScore().size()];
 
                             /*make the chart*/
                             for (int i = 0; i < profileSection.getDailyScore().size(); i++) {
-                                lineChatEntryData.add(new Entry(i, Math.round((float) profileSection.getDailyScore().get(i).getScorePercentage())));
-                                lebels.add(Util.getFormattedDate(profileSection.getDailyScore().get(i).getDate()));
+                                Log.e("MKDATA", String.valueOf(Math.round((float) profileSection.getDailyScore().get(i).getScorePercentage())));
+                                lineChatEntryData.add(new Entry((float) profileSection.getDailyScore().get(i).getScorePercentage(), i));
+                                //  lebels.add(Util.getFormattedDate(profileSection.getDailyScore().get(i).getDate()));
+                                lebels[i] = Util.getFormattedDate(profileSection.getDailyScore().get(i).getDate());
 
                             }
 
-                            lineChatEntryData.add(new Entry(2, 35));
+                         /*   lineChatEntryData.add(new Entry(2, 35));
                             lineChatEntryData.add(new Entry(3, 55));
                             lineChatEntryData.add(new Entry(4, 35));
                             lineChatEntryData.add(new Entry(5, 60));
@@ -230,15 +220,18 @@ public class ViewProfileFragment extends Fragment {
                             lineChatEntryData.add(new Entry(7, 70));
 
 
-
                             lebels.add("30");
                             lebels.add("28");
                             lebels.add("27");
                             lebels.add("26");
                             lebels.add("25");
-                            lebels.add("24");
+                            lebels.add("24");*/
 
-                            chartBuilder(lebels, lineChatEntryData);
+                         if(lebels.length != 0 && lineChatEntryData.size() != 0){
+                             chartBuilder(lebels, lineChatEntryData);
+                         }
+
+
 
                             /*dismiss the dialog*/
                             Util.dissmisDialog(dialog);
@@ -248,16 +241,16 @@ public class ViewProfileFragment extends Fragment {
                             Util.dissmisDialog(dialog);
                             /*get all the error messages and show to the user*/
                             String message = jsonObject.getString("message");
-                            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    if(getActivity()!=null)
-                    /*dismiss the dialog*/
-                    Util.dissmisDialog(dialog);
-                    Toast.makeText(getActivity(), R.string.no_data_found, Toast.LENGTH_SHORT).show();
+                    if (getActivity() != null)
+                        /*dismiss the dialog*/
+                        Util.dissmisDialog(dialog);
+                    Toast.makeText(activity, R.string.no_data_found, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -268,8 +261,8 @@ public class ViewProfileFragment extends Fragment {
                 Util.dissmisDialog(dialog);
                 /*handle network error and notify the user*/
                 if (t instanceof SocketTimeoutException || t instanceof IOException) {
-                    if (getActivity() != null && isAdded())
-                        Toast.makeText(getActivity(), R.string.connection_timeout, Toast.LENGTH_SHORT).show();
+                    if (activity != null && isAdded())
+                        Toast.makeText(activity, R.string.connection_timeout, Toast.LENGTH_SHORT).show();
                 }
             }
         });

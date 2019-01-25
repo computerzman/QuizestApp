@@ -1,28 +1,28 @@
 package com.quizest.quizestapp.ActivityPackage;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.quizest.quizestapp.AdapterPackage.QuizViewPagerAdapter;
-import com.quizest.quizestapp.CustomViews.CustomViewPager;
-import com.quizest.quizestapp.CustomViews.ViewPagerCustomDuration;
 import com.quizest.quizestapp.FragmentPackage.DashboardFragments.QuizFragment;
 import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.QuestionList;
-import com.quizest.quizestapp.ModelPackage.UserLogIn;
 import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
 import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
 import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
@@ -33,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +48,7 @@ public class QuizActivity extends AppCompatActivity {
     ImageButton btn_back, btnSetting;
     Fragment currentFragment;
     public QuestionList questionList;
+    String CATEGORYNAME;
 
     public static HashMap<String, Boolean> isPlayed;
     List<Fragment> quizList;
@@ -76,14 +76,14 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(QuizActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 QuizActivity.this.overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
                 finish();
             }
         });
 
-/*if user clicks on the setting button take the user to the Setting activity*/
+        /*if user clicks on the setting button take the user to the Setting activity*/
         btnSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,6 +97,8 @@ public class QuizActivity extends AppCompatActivity {
         /*track the total point of a user globally*/
         Util.TOTAL_POINT = 0;
 
+        Util.TOTAL_COIN = 0;
+
         /*intilize the lists*/
         quizList = new ArrayList<>();
 
@@ -107,6 +109,7 @@ public class QuizActivity extends AppCompatActivity {
         /*get the question id from intent and pass it to the getQuestionList function to do the api call for question list */
 
         String QUESTION_ID = getIntent().getStringExtra(Util.QUIZLIST);
+        CATEGORYNAME = getIntent().getStringExtra("CATEGORY_NAME");
         if (QUESTION_ID != null) {
             getQuestionList(QUESTION_ID);
         }
@@ -115,12 +118,11 @@ public class QuizActivity extends AppCompatActivity {
     }
 
 
-
     /*this is called when user press back button*/
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
     }
@@ -132,6 +134,7 @@ public class QuizActivity extends AppCompatActivity {
         final ProgressDialog dialog = Util.showDialog(this);
         RetrofitInterface retrofitInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
         final Call<String> questionCall = retrofitInterface.getQuizList(RetrofitClient.CATEGORY_URL + QUESTION_ID, storage.getAccessToken());
+        Log.e("TOKEN", storage.getAccessToken());
         questionCall.enqueue(new Callback<String>() {
             @SuppressLint("DefaultLocale")
             @Override
@@ -152,11 +155,56 @@ public class QuizActivity extends AppCompatActivity {
 
                             if (questionList != null) {
                                 if (questionList.getAvailableQuestionList().size() != 0) {
-                                    QuizFragment quizFragment = new QuizFragment();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putSerializable(Util.QUESTION, questionList.getAvailableQuestionList().get(0));
-                                    quizFragment.setArguments(bundle);
-                                    fragmentTransition(quizFragment);
+
+                                    /*show overview dialog first*/
+                                    final Dialog overviewDialog = new Dialog(QuizActivity.this);
+                                    overviewDialog.setContentView(R.layout.layout_questing_overview);
+                                    overviewDialog.getWindow().getAttributes().windowAnimations = R.style.alert_dialog;
+                                    overviewDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                                    TextView categoryName = overviewDialog.findViewById(R.id.tv_which_category);
+                                    TextView totalQuestion = overviewDialog.findViewById(R.id.tv_total_question);
+                                    TextView totalPoint = overviewDialog.findViewById(R.id.tv_total_point);
+                                    TextView totalCoin = overviewDialog.findViewById(R.id.tv_total_coin);
+
+
+                                    categoryName.setText(String.format("In %s Category", CATEGORYNAME));
+                                    totalQuestion.setText(String.format("%d", questionList.getTotalQuestion()));
+                                    totalPoint.setText(String.format("%d", questionList.getTotalPoint()));
+                                    totalCoin.setText(String.format("%d", questionList.getTotalCoin()));
+
+                                    Button letStart = overviewDialog.findViewById(R.id.btn_let_start);
+                                    Button cancel = overviewDialog.findViewById(R.id.btn_cancel);
+
+                                    letStart.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            if (overviewDialog.isShowing()) {
+                                                overviewDialog.dismiss();
+                                            }
+
+                                            QuizFragment quizFragment = new QuizFragment();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putSerializable(Util.QUESTION, questionList.getAvailableQuestionList().get(0));
+                                            bundle.putInt("TOTAL_POINT", Integer.parseInt(questionList.getUser_available_point()));
+                                            bundle.putInt("TOTAL_COIN", questionList.getUser_available_coin());
+                                            bundle.putInt("HINT_POINT", questionList.getHintsCoin());
+                                            quizFragment.setArguments(bundle);
+                                            fragmentTransition(quizFragment);
+                                        }
+                                    });
+
+                                    cancel.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            if (overviewDialog.isShowing()) {
+                                                overviewDialog.dismiss();
+                                            }
+                                        }
+                                    });
+
+                                    overviewDialog.show();
+
                                 } else {
                                     Toast.makeText(QuizActivity.this, "NO Question Found!", Toast.LENGTH_SHORT).show();
                                 }

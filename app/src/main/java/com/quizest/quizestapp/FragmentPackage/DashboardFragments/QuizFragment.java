@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,6 +23,8 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,12 +33,25 @@ import com.google.android.gms.ads.AdView;
 import com.quizest.quizestapp.ActivityPackage.MainActivity;
 import com.quizest.quizestapp.ActivityPackage.QuizActivity;
 import com.quizest.quizestapp.AdapterPackage.QuizOptionsRecyclerRow;
+import com.quizest.quizestapp.LocalStorage.Storage;
 import com.quizest.quizestapp.ModelPackage.QuestionList;
+import com.quizest.quizestapp.NetworkPackage.ErrorHandler;
+import com.quizest.quizestapp.NetworkPackage.RetrofitClient;
+import com.quizest.quizestapp.NetworkPackage.RetrofitInterface;
 import com.quizest.quizestapp.R;
 import com.quizest.quizestapp.UtilPackge.Util;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,7 +64,12 @@ public class QuizFragment extends Fragment {
     Button btnSkip, btn_next;
     ImageView ivAnswerA;
     Button quiz;
-    TextView tv_question_name, tv_user_point;
+
+    public int TOTAL_COIN = 0;
+    public int TOTAL_POINT = 0;
+    private int HINT_POINT = 0;
+
+    TextView tv_question_name, tv_user_point, tv_user_coin;
     TextView tvQuizCount, tv_quiz_time, tvQuizPosition;
     RecyclerView optionRecyclerView;
     ImageView catStatus, iv_stopwatch;
@@ -91,7 +113,6 @@ public class QuizFragment extends Fragment {
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
-        tv_user_point.setText(String.valueOf(Util.QuizPoint));
 
         if (getActivity() != null && isAdded()) {
             /*make the counter value to default*/
@@ -114,9 +135,21 @@ public class QuizFragment extends Fragment {
                 }
                 /*make the option recycler view*/
                 tv_question_name.setText(questionItem.getTitle());
-                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), catStatus, tv_user_point);
+                quizOptionsRecyclerRow = new QuizOptionsRecyclerRow(this, questionItem.getOptions(), getActivity(), questionItem.getQuestionId(), questionItem.getPoint(), questionItem.getCoin(), catStatus, tv_user_coin, tv_user_point);
                 optionRecyclerView.setAdapter(quizOptionsRecyclerRow);
+
+
+                /*take total user coin, point and hint point*/
+
+                TOTAL_POINT = getArguments().getInt("TOTAL_POINT");
+                TOTAL_COIN = getArguments().getInt("TOTAL_COIN");
+                HINT_POINT = getArguments().getInt("HINT_POINT");
+
+
+                tv_user_coin.setText(String.valueOf(TOTAL_COIN));
+                tv_user_point.setText(String.valueOf(TOTAL_POINT));
             }
+
         }
 
 
@@ -126,7 +159,9 @@ public class QuizFragment extends Fragment {
                 /*if user clicks the next button chcek if the quesetion is played and then take the user to the next question*/
                 try {
                     if (QuizActivity.isPlayed.get(questionItem.getQuestionId())) {
-                        btnSkip.performClick();
+
+                        goToQuestion();
+
                     } else {
                         Toast.makeText(getActivity(), "sorry, Play first!", Toast.LENGTH_SHORT).show();
                     }
@@ -142,26 +177,30 @@ public class QuizFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                /*take the user to the next question if all question are finished then show the result dialog*/
+                /*  *//*take the user to the next question if all question are finished then show the result dialog*//*
                 if (getActivity() != null && isAdded()) {
                     if (((QuizActivity) getActivity()).questionList != null) {
-                        Log.e("size", String.valueOf(((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()));
+                        //   Log.e("size", String.valueOf(((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()));
                         if (((QuizActivity) getActivity()).x
                                 < ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()) {
                             QuizFragment quizFragment = new QuizFragment();
                             Bundle bundle = new Bundle();
                             if (getActivity() != null)
                                 bundle.putSerializable(Util.QUESTION, ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().get(((QuizActivity) getActivity()).x++));
+                            bundle.putInt("TOTAL_POINT", TOTAL_POINT);
+                            bundle.putInt("TOTAL_COIN", TOTAL_COIN);
+                            bundle.putInt("HINT_POINT", HINT_POINT);
                             quizFragment.setArguments(bundle);
 
                             ((QuizActivity) getActivity()).fragmentTransition(quizFragment);
 
                         } else {
 
-                            /*take the user to the result dialog*/
+                            *//*take the user to the result dialog*//*
                             Dialog dialog = new Dialog(getActivity(), android.R.style.Theme_Light_NoTitleBar_Fullscreen);
                             dialog.setContentView(R.layout.layout_congrats_dialog);
-                            TextView tv_result = dialog.findViewById(R.id.tv_result);
+                            TextView earnedPoint = dialog.findViewById(R.id.tv_earned_point);
+                            TextView earnedCoin = dialog.findViewById(R.id.tv_earned_coin);
                             quiz = dialog.findViewById(R.id.btn_quiz);
 
                             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -182,11 +221,52 @@ public class QuizFragment extends Fragment {
                                     getActivity().finish();
                                 }
                             });
-                            tv_result.setText(String.valueOf(Util.TOTAL_POINT));
+                            earnedCoin.setText(String.valueOf(Util.TOTAL_COIN));
+                            earnedPoint.setText(String.valueOf(Util.TOTAL_POINT));
                             dialog.show();
                         }
                     }
-                }
+                }*/
+
+
+                final Dialog dialog = new Dialog(getActivity());
+                dialog.setContentView(R.layout.skip_question_dialog_layout);
+                final TextView categoryName = dialog.findViewById(R.id.tv_dialog_categoryname);
+                TextView coinNeed = dialog.findViewById(R.id.tv_dialog_coin_need);
+                TextView coinIHave = dialog.findViewById(R.id.tv_dialog_coin_ihave);
+                Button letStart = dialog.findViewById(R.id.btn_let_start);
+                Button cancel = dialog.findViewById(R.id.btn_cancel);
+
+                final LinearLayout coin;
+                final ProgressBar progressBar;
+                final TextView message;
+
+                message = dialog.findViewById(R.id.tv_message);
+                coin = dialog.findViewById(R.id.layout_coin);
+                progressBar = dialog.findViewById(R.id.pb_progress);
+
+                dialog.getWindow().getAttributes().windowAnimations = R.style.alert_dialog;
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                coinNeed.setText(String.format("%d Coin", questionItem.getSkipCoin()));
+                coinIHave.setText(String.format("%d", TOTAL_COIN));
+
+                letStart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        expandCoin(dialog, questionItem.getSkipCoin(), progressBar, coin, message, categoryName);
+                    }
+                });
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+                // coinIHave.setText(String.format("%d Coin", categoryModelList.get(getAdapterPosition()).get));
+
+                dialog.show();
+
             }
         });
 
@@ -200,6 +280,60 @@ public class QuizFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+
+    }
+
+    /*funcation for go to next question*/
+    private void goToQuestion() {
+        /*take the user to the next question if all question are finished then show the result dialog*/
+        if (getActivity() != null && isAdded()) {
+            if (((QuizActivity) getActivity()).questionList != null) {
+                if (((QuizActivity) getActivity()).x
+                        < ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().size()) {
+                    QuizFragment quizFragment = new QuizFragment();
+                    Bundle bundle = new Bundle();
+                    if (getActivity() != null)
+                        bundle.putSerializable(Util.QUESTION, ((QuizActivity) getActivity()).questionList.getAvailableQuestionList().get(((QuizActivity) getActivity()).x++));
+                    bundle.putInt("TOTAL_POINT", TOTAL_POINT);
+                    bundle.putInt("TOTAL_COIN", TOTAL_COIN);
+                    bundle.putInt("HINT_POINT", HINT_POINT);
+                    quizFragment.setArguments(bundle);
+
+                    ((QuizActivity) getActivity()).fragmentTransition(quizFragment);
+
+                } else {
+
+                    /*take the user to the result dialog*/
+                    Dialog dialog = new Dialog(getActivity(), android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                    dialog.setContentView(R.layout.layout_congrats_dialog);
+                    TextView earnedPoint = dialog.findViewById(R.id.tv_earned_point);
+                    TextView earnedCoin = dialog.findViewById(R.id.tv_earned_coin);
+                    quiz = dialog.findViewById(R.id.btn_quiz);
+
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            getActivity().finish();
+                        }
+                    });
+                    quiz.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            getActivity().finish();
+                        }
+                    });
+                    earnedCoin.setText(String.valueOf(Util.TOTAL_COIN));
+                    earnedPoint.setText(String.valueOf(Util.TOTAL_POINT));
+                    dialog.show();
+                }
+            }
+        }
 
     }
 
@@ -231,7 +365,7 @@ public class QuizFragment extends Fragment {
     }
 
 
-//    set data to the timer
+    //    set data to the timer
     @SuppressLint("DefaultLocale")
     private void setQuizTime(HashMap<String, Integer> timeFromMillisecond) {
         if (getActivity() != null && isAdded()) {
@@ -251,6 +385,8 @@ public class QuizFragment extends Fragment {
     /*type casting the views*/
     private void initViews() {
         if (view != null) {
+
+            tv_user_coin = view.findViewById(R.id.tv_usercoin);
             btn_next = view.findViewById(R.id.btn_next);
             tv_user_point = view.findViewById(R.id.tv_user_point);
             catStatus = view.findViewById(R.id.img_cat_status);
@@ -265,7 +401,7 @@ public class QuizFragment extends Fragment {
     }
 
 
-//  do the animation
+    //  do the animation
     private void doBlinkAnimation(TextView textView) {
         Animation anim = new AlphaAnimation(0.0f, 1.0f);
         anim.setDuration(50); //You can manage the blinking time with this parameter
@@ -292,5 +428,77 @@ public class QuizFragment extends Fragment {
         super.onDestroyView();
     }
 
+
+    private void expandCoin(final Dialog dialog, final int amount, final ProgressBar progressBar, LinearLayout coin, final TextView message, TextView categoryName) {
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        categoryName.setVisibility(View.GONE);
+        coin.setVisibility(View.GONE);
+
+
+        Storage storage = new Storage(getActivity());
+        RetrofitInterface networkInterface = RetrofitClient.getRetrofit().create(RetrofitInterface.class);
+        Call<String> expandCoint = networkInterface.expandCoin(storage.getAccessToken(), amount);
+        expandCoint.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                /*handle error globally */
+                ErrorHandler.getInstance().handleError(response.code(), getActivity(), null);
+                if (response.isSuccessful()) {
+                    /*success true*/
+                    try {
+
+                        JSONObject jsonObject = new JSONObject(response.body());
+                        boolean isSuccess = jsonObject.getBoolean("success");
+
+                        if (isSuccess) {
+
+                            if (dialog != null && dialog.isShowing()) {
+                                dialog.dismiss();
+                            }
+
+                            /*get all the error messages and show to the user*/
+                            String message = jsonObject.getString("message");
+                            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+
+                            /*detuct the coin from total coin*/
+
+                            if (TOTAL_COIN != 0) {
+                                TOTAL_COIN = TOTAL_COIN - amount;
+                            }
+
+
+                            /*code for go to next question*/
+
+                            goToQuestion();
+
+                        } else {
+                            /*get all the error messages and show to the user*/
+                            String messageTxt = jsonObject.getString("message");
+                            progressBar.setVisibility(View.GONE);
+                            message.setVisibility(View.VISIBLE);
+                            message.setText(messageTxt);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), R.string.no_data_found, Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                /*handle network error and notify the user*/
+                if (t instanceof SocketTimeoutException || t instanceof IOException) {
+                    Toast.makeText(getActivity(), R.string.connection_timeout, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
 }
